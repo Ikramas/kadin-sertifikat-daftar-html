@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -66,7 +65,7 @@ const DocumentUploadForm = () => {
     <div className="group relative">
       <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
       
-      <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-8 border border-white/50">
+      <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50">
         <div className="flex items-center mb-6">
           <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-3 rounded-2xl mr-4 shadow-lg">
             <Upload className="w-6 h-6 text-white" />
@@ -125,7 +124,6 @@ const DocumentUploadForm = () => {
           ))}
         </div>
 
-        {/* Upload status indicator */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-2xl p-4 text-center">
             <AlertCircle className="w-8 h-8 text-red-600 mx-auto mb-2" />
@@ -146,7 +144,6 @@ const DocumentUploadForm = () => {
           </div>
         </div>
 
-        {/* Important notes */}
         <div className="mt-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-6">
           <div className="flex items-start">
             <div className="bg-blue-100 p-2 rounded-xl mr-4">
@@ -184,18 +181,6 @@ const DocumentUploadForm = () => {
                   </li>
                 </ul>
               </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <div className="flex justify-between items-center text-sm text-gray-600">
-            <span>Langkah 3 dari 4</span>
-            <div className="flex space-x-1">
-              <div className="w-8 h-1 bg-purple-600 rounded-full"></div>
-              <div className="w-8 h-1 bg-purple-600 rounded-full"></div>
-              <div className="w-8 h-1 bg-purple-600 rounded-full"></div>
-              <div className="w-8 h-1 bg-gray-200 rounded-full"></div>
             </div>
           </div>
         </div>

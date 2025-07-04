@@ -1,27 +1,25 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Building2, MapPin, Phone, Mail, Globe, Calendar, FileText } from 'lucide-react';
+import { Building2, MapPin, Phone, Mail, Globe, Users, Calendar, Briefcase } from 'lucide-react';
 
 const CompanyInfoForm = () => {
   return (
     <div className="group relative">
-      {/* Background glow effect */}
       <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
       
-      <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-8 border border-white/50">
+      <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50">
         <div className="flex items-center mb-6">
           <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-2xl mr-4 shadow-lg">
             <Building2 className="w-6 h-6 text-white" />
           </div>
           <div>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-800 to-blue-900 bg-clip-text text-transparent">
-              Informasi Badan Usaha
+              Informasi Perusahaan
             </h2>
-            <p className="text-gray-600 mt-1">Lengkapi informasi dasar perusahaan Anda</p>
+            <p className="text-gray-600 mt-1">Data lengkap perusahaan yang akan didaftarkan</p>
           </div>
         </div>
         
@@ -30,89 +28,62 @@ const CompanyInfoForm = () => {
             <div className="group/field">
               <Label htmlFor="companyName" className="flex items-center text-gray-700 font-semibold mb-3">
                 <Building2 className="w-4 h-4 mr-2 text-blue-600" />
-                Nama Badan Usaha *
+                Nama Perusahaan *
               </Label>
               <Input 
                 id="companyName" 
-                placeholder="Masukkan nama lengkap badan usaha"
+                placeholder="Masukkan nama lengkap perusahaan"
                 className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/80 hover:bg-white group-hover/field:border-blue-300"
               />
             </div>
 
             <div className="group/field">
               <Label htmlFor="companyType" className="flex items-center text-gray-700 font-semibold mb-3">
-                <FileText className="w-4 h-4 mr-2 text-blue-600" />
-                Bentuk Badan Usaha *
+                <Briefcase className="w-4 h-4 mr-2 text-purple-600" />
+                Jenis Perusahaan *
               </Label>
               <Select>
                 <SelectTrigger className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 bg-white/80 hover:bg-white group-hover/field:border-blue-300">
-                  <SelectValue placeholder="Pilih bentuk badan usaha" />
+                  <SelectValue placeholder="Pilih jenis perusahaan" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border-2 shadow-2xl">
                   <SelectItem value="pt">PT (Perseroan Terbatas)</SelectItem>
                   <SelectItem value="cv">CV (Commanditaire Vennootschap)</SelectItem>
                   <SelectItem value="ud">UD (Usaha Dagang)</SelectItem>
-                  <SelectItem value="koperasi">Koperasi</SelectItem>
-                  <SelectItem value="yayasan">Yayasan</SelectItem>
                   <SelectItem value="firma">Firma</SelectItem>
+                  <SelectItem value="koperasi">Koperasi</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="group/field">
-              <Label htmlFor="npwp" className="flex items-center text-gray-700 font-semibold mb-3">
-                <FileText className="w-4 h-4 mr-2 text-green-600" />
-                NPWP *
+              <Label htmlFor="establishedYear" className="flex items-center text-gray-700 font-semibold mb-3">
+                <Calendar className="w-4 h-4 mr-2 text-green-600" />
+                Tahun Berdiri *
               </Label>
               <Input 
-                id="npwp" 
-                placeholder="00.000.000.0-000.000"
+                id="establishedYear" 
+                type="number"
+                placeholder="Tahun perusahaan didirikan"
                 className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/80 hover:bg-white group-hover/field:border-blue-300"
               />
             </div>
 
             <div className="group/field">
-              <Label htmlFor="nib" className="flex items-center text-gray-700 font-semibold mb-3">
-                <FileText className="w-4 h-4 mr-2 text-purple-600" />
-                NIB (Nomor Induk Berusaha) *
-              </Label>
-              <Input 
-                id="nib" 
-                placeholder="Masukkan NIB"
-                className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/80 hover:bg-white group-hover/field:border-blue-300"
-              />
-            </div>
-
-            <div className="group/field">
-              <Label htmlFor="establishDate" className="flex items-center text-gray-700 font-semibold mb-3">
-                <Calendar className="w-4 h-4 mr-2 text-orange-600" />
-                Tanggal Pendirian *
-              </Label>
-              <Input 
-                id="establishDate" 
-                type="date"
-                className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/80 hover:bg-white group-hover/field:border-blue-300"
-              />
-            </div>
-
-            <div className="group/field">
-              <Label htmlFor="businessField" className="flex items-center text-gray-700 font-semibold mb-3">
-                <Building2 className="w-4 h-4 mr-2 text-indigo-600" />
-                Bidang Usaha *
+              <Label htmlFor="employeeCount" className="flex items-center text-gray-700 font-semibold mb-3">
+                <Users className="w-4 h-4 mr-2 text-orange-600" />
+                Jumlah Karyawan *
               </Label>
               <Select>
                 <SelectTrigger className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 bg-white/80 hover:bg-white group-hover/field:border-blue-300">
-                  <SelectValue placeholder="Pilih bidang usaha" />
+                  <SelectValue placeholder="Pilih rentang jumlah karyawan" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border-2 shadow-2xl">
-                  <SelectItem value="perdagangan">Perdagangan</SelectItem>
-                  <SelectItem value="manufaktur">Manufaktur</SelectItem>
-                  <SelectItem value="jasa">Jasa</SelectItem>
-                  <SelectItem value="konstruksi">Konstruksi</SelectItem>
-                  <SelectItem value="pertanian">Pertanian</SelectItem>
-                  <SelectItem value="teknologi">Teknologi Informasi</SelectItem>
-                  <SelectItem value="transportasi">Transportasi</SelectItem>
-                  <SelectItem value="pariwisata">Pariwisata</SelectItem>
+                  <SelectItem value="1-10">1-10 orang</SelectItem>
+                  <SelectItem value="11-50">11-50 orang</SelectItem>
+                  <SelectItem value="51-100">51-100 orang</SelectItem>
+                  <SelectItem value="101-500">101-500 orang</SelectItem>
+                  <SelectItem value="500+">500+ orang</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -126,83 +97,34 @@ const CompanyInfoForm = () => {
               </Label>
               <Textarea 
                 id="address" 
-                placeholder="Masukkan alamat lengkap badan usaha"
-                className="min-h-[120px] border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/80 hover:bg-white group-hover/field:border-blue-300 resize-none"
+                placeholder="Masukkan alamat lengkap perusahaan"
+                className="min-h-[120px] border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/80 hover:bg-white group-hover/field:border-blue-300"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="group/field">
-                <Label htmlFor="city" className="flex items-center text-gray-700 font-semibold mb-3">
-                  <MapPin className="w-4 h-4 mr-2 text-green-600" />
-                  Kota/Kabupaten *
-                </Label>
-                <Input 
-                  id="city" 
-                  placeholder="Kota/Kabupaten"
-                  className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/80 hover:bg-white group-hover/field:border-blue-300"
-                />
-              </div>
-
-              <div className="group/field">
-                <Label htmlFor="postalCode" className="flex items-center text-gray-700 font-semibold mb-3">
-                  <MapPin className="w-4 h-4 mr-2 text-purple-600" />
-                  Kode Pos *
-                </Label>
-                <Input 
-                  id="postalCode" 
-                  placeholder="Kode pos"
-                  className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/80 hover:bg-white group-hover/field:border-blue-300"
-                />
-              </div>
+            <div className="group/field">
+              <Label htmlFor="phone" className="flex items-center text-gray-700 font-semibold mb-3">
+                <Phone className="w-4 h-4 mr-2 text-green-600" />
+                Nomor Telepon *
+              </Label>
+              <Input 
+                id="phone" 
+                placeholder="Masukkan nomor telepon perusahaan"
+                className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/80 hover:bg-white group-hover/field:border-blue-300"
+              />
             </div>
 
             <div className="group/field">
-              <Label htmlFor="province" className="flex items-center text-gray-700 font-semibold mb-3">
-                <MapPin className="w-4 h-4 mr-2 text-blue-600" />
-                Provinsi *
+              <Label htmlFor="email" className="flex items-center text-gray-700 font-semibold mb-3">
+                <Mail className="w-4 h-4 mr-2 text-blue-600" />
+                Email Perusahaan *
               </Label>
-              <Select>
-                <SelectTrigger className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 bg-white/80 hover:bg-white group-hover/field:border-blue-300">
-                  <SelectValue placeholder="Pilih provinsi" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl border-2 shadow-2xl">
-                  <SelectItem value="jakarta">DKI Jakarta</SelectItem>
-                  <SelectItem value="jabar">Jawa Barat</SelectItem>
-                  <SelectItem value="jateng">Jawa Tengah</SelectItem>
-                  <SelectItem value="jatim">Jawa Timur</SelectItem>
-                  <SelectItem value="sumut">Sumatera Utara</SelectItem>
-                  <SelectItem value="sumbar">Sumatera Barat</SelectItem>
-                  <SelectItem value="bali">Bali</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="group/field">
-                <Label htmlFor="phone" className="flex items-center text-gray-700 font-semibold mb-3">
-                  <Phone className="w-4 h-4 mr-2 text-green-600" />
-                  Nomor Telepon *
-                </Label>
-                <Input 
-                  id="phone" 
-                  placeholder="Nomor telepon"
-                  className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/80 hover:bg-white group-hover/field:border-blue-300"
-                />
-              </div>
-
-              <div className="group/field">
-                <Label htmlFor="email" className="flex items-center text-gray-700 font-semibold mb-3">
-                  <Mail className="w-4 h-4 mr-2 text-red-600" />
-                  Email *
-                </Label>
-                <Input 
-                  id="email" 
-                  type="email"
-                  placeholder="Alamat email"
-                  className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/80 hover:bg-white group-hover/field:border-blue-300"
-                />
-              </div>
+              <Input 
+                id="email" 
+                type="email"
+                placeholder="Masukkan email resmi perusahaan"
+                className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/80 hover:bg-white group-hover/field:border-blue-300"
+              />
             </div>
 
             <div className="group/field">
@@ -212,22 +134,26 @@ const CompanyInfoForm = () => {
               </Label>
               <Input 
                 id="website" 
-                placeholder="https://www.perusahaan-anda.com"
+                placeholder="https://www.perusahaan.co.id"
                 className="h-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 bg-white/80 hover:bg-white group-hover/field:border-blue-300"
               />
             </div>
           </div>
         </div>
 
-        {/* Progress indicator at bottom */}
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <div className="flex justify-between items-center text-sm text-gray-600">
-            <span>Langkah 1 dari 4</span>
-            <div className="flex space-x-1">
-              <div className="w-8 h-1 bg-blue-600 rounded-full"></div>
-              <div className="w-8 h-1 bg-gray-200 rounded-full"></div>
-              <div className="w-8 h-1 bg-gray-200 rounded-full"></div>
-              <div className="w-8 h-1 bg-gray-200 rounded-full"></div>
+        <div className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-2xl p-6">
+          <div className="flex items-start">
+            <div className="bg-blue-100 p-2 rounded-xl mr-4">
+              <Building2 className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h4 className="font-semibold text-blue-800 mb-2">Informasi Penting</h4>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• Pastikan semua data sesuai dengan dokumen resmi perusahaan</li>
+                <li>• Nama perusahaan harus sama dengan yang tertera di akta pendirian</li>
+                <li>• Email dan nomor telepon akan digunakan untuk komunikasi resmi</li>
+                <li>• Data akan diverifikasi dengan dokumen yang akan diupload</li>
+              </ul>
             </div>
           </div>
         </div>

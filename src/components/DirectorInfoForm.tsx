@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,7 +9,7 @@ const DirectorInfoForm = () => {
     <div className="group relative">
       <div className="absolute -inset-0.5 bg-gradient-to-r from-green-600 to-blue-600 rounded-3xl blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
       
-      <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 mb-8 border border-white/50">
+      <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50">
         <div className="flex items-center mb-6">
           <div className="bg-gradient-to-br from-green-500 to-green-600 p-3 rounded-2xl mr-4 shadow-lg">
             <User className="w-6 h-6 text-white" />
@@ -109,7 +108,6 @@ const DirectorInfoForm = () => {
           </div>
         </div>
 
-        {/* Info card */}
         <div className="mt-8 bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-2xl p-6">
           <div className="flex items-start">
             <div className="bg-green-100 p-2 rounded-xl mr-4">
@@ -123,18 +121,6 @@ const DirectorInfoForm = () => {
                 <li>• Nomor KTP harus valid dan masih berlaku</li>
                 <li>• Data akan diverifikasi dengan dokumen yang diupload</li>
               </ul>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <div className="flex justify-between items-center text-sm text-gray-600">
-            <span>Langkah 2 dari 4</span>
-            <div className="flex space-x-1">
-              <div className="w-8 h-1 bg-green-600 rounded-full"></div>
-              <div className="w-8 h-1 bg-green-600 rounded-full"></div>
-              <div className="w-8 h-1 bg-gray-200 rounded-full"></div>
-              <div className="w-8 h-1 bg-gray-200 rounded-full"></div>
             </div>
           </div>
         </div>

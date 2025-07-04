@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -23,7 +22,6 @@ const SubmitSection = () => {
           </div>
         </div>
         
-        {/* Agreement checkboxes */}
         <div className="space-y-6 mb-8">
           <div className="group/check flex items-start space-x-4 p-4 rounded-2xl border-2 border-gray-100 hover:border-green-200 hover:bg-green-50/30 transition-all duration-300">
             <Checkbox id="terms" className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600" />
@@ -51,7 +49,6 @@ const SubmitSection = () => {
           </div>
         </div>
 
-        {/* Security assurance */}
         <div className="mb-8 bg-gradient-to-r from-green-50 via-blue-50 to-purple-50 rounded-2xl border-2 border-green-200 p-6">
           <div className="flex items-start space-x-4">
             <div className="bg-green-100 p-2 rounded-xl">
@@ -85,7 +82,6 @@ const SubmitSection = () => {
           </div>
         </div>
 
-        {/* Action buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
           <Button 
             variant="outline" 
@@ -103,7 +99,6 @@ const SubmitSection = () => {
           </Button>
         </div>
 
-        {/* Process timeline */}
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
           <h4 className="font-semibold text-blue-800 mb-4 text-center">Tahapan Setelah Pengajuan</h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
