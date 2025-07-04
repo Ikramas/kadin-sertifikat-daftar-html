@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { Shield, Award, CheckCircle, Users } from 'lucide-react';
+import { Shield, Award, CheckCircle, Users, ArrowRight, Star } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const HeroSection = () => {
   return (
@@ -16,59 +17,106 @@ const HeroSection = () => {
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto text-center text-white">
-          <div className="mb-8">
-            <div className="inline-flex items-center px-4 py-2 bg-white/10 rounded-full backdrop-blur-sm border border-white/20 mb-6">
-              <Shield className="w-4 h-4 mr-2 text-yellow-400" />
-              <span className="text-sm font-medium">Sertifikasi Resmi KADIN Indonesia</span>
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left Content */}
+          <div className="text-white">
+            <div className="mb-8">
+              <div className="inline-flex items-center px-4 py-2 bg-white/10 rounded-full backdrop-blur-sm border border-white/20 mb-6">
+                <Shield className="w-4 h-4 mr-2 text-yellow-400" />
+                <span className="text-sm font-medium">Sertifikasi Resmi KADIN Indonesia</span>
+              </div>
             </div>
-          </div>
-          
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-            Pendaftaran
-            <span className="block bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-              Sertifikat Badan Usaha
-            </span>
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed max-w-3xl mx-auto">
-            Dapatkan sertifikat resmi untuk meningkatkan kredibilitas dan kepercayaan bisnis Anda 
-            dengan proses yang mudah, cepat, dan terpercaya.
-          </p>
+            
+            <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold mb-6 leading-tight">
+              Pendaftaran
+              <span className="block bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                Sertifikat Badan Usaha
+              </span>
+            </h1>
+            
+            <p className="text-xl text-blue-100 mb-8 leading-relaxed">
+              Dapatkan sertifikat resmi untuk meningkatkan kredibilitas dan kepercayaan bisnis Anda 
+              dengan proses yang mudah, cepat, dan terpercaya.
+            </p>
 
-          <div className="flex flex-wrap justify-center gap-6 mb-12">
-            <div className="flex items-center bg-white/10 px-4 py-3 rounded-lg backdrop-blur-sm">
-              <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
-              <span className="text-sm font-medium">Proses Cepat 3-5 Hari</span>
+            <div className="flex flex-wrap gap-4 mb-8">
+              <div className="flex items-center bg-white/10 px-4 py-3 rounded-lg backdrop-blur-sm">
+                <CheckCircle className="w-5 h-5 text-green-400 mr-2" />
+                <span className="text-sm font-medium">Proses Cepat 3-5 Hari</span>
+              </div>
+              <div className="flex items-center bg-white/10 px-4 py-3 rounded-lg backdrop-blur-sm">
+                <Award className="w-5 h-5 text-yellow-400 mr-2" />
+                <span className="text-sm font-medium">Sertifikat Resmi</span>
+              </div>
+              <div className="flex items-center bg-white/10 px-4 py-3 rounded-lg backdrop-blur-sm">
+                <Users className="w-5 h-5 text-blue-400 mr-2" />
+                <span className="text-sm font-medium">10,000+ Perusahaan</span>
+              </div>
             </div>
-            <div className="flex items-center bg-white/10 px-4 py-3 rounded-lg backdrop-blur-sm">
-              <Award className="w-5 h-5 text-yellow-400 mr-2" />
-              <span className="text-sm font-medium">Sertifikat Resmi</span>
-            </div>
-            <div className="flex items-center bg-white/10 px-4 py-3 rounded-lg backdrop-blur-sm">
-              <Users className="w-5 h-5 text-blue-400 mr-2" />
-              <span className="text-sm font-medium">Dipercaya 10,000+ Perusahaan</span>
-            </div>
+
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
+              Mulai Pendaftaran
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
           </div>
 
-          <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 rounded-2xl p-6 backdrop-blur-sm">
-            <h3 className="text-lg font-semibold text-yellow-300 mb-3">Persyaratan Umum</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-100">
-              <div className="flex items-center">
-                <CheckCircle className="w-4 h-4 text-green-400 mr-2 flex-shrink-0" />
-                <span>Badan usaha beroperasi minimal 1 tahun</span>
+          {/* Right Content - Requirements Card */}
+          <div className="lg:pl-8">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 shadow-2xl">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-lg flex items-center justify-center mr-4">
+                  <Star className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-white mb-1">Persyaratan Umum</h3>
+                  <p className="text-blue-200 text-sm">Pastikan perusahaan Anda memenuhi kriteria berikut</p>
+                </div>
               </div>
-              <div className="flex items-center">
-                <CheckCircle className="w-4 h-4 text-green-400 mr-2 flex-shrink-0" />
-                <span>Memiliki izin usaha yang berlaku</span>
+              
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <CheckCircle className="w-5 h-5 text-green-400 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <span className="text-white font-medium">Badan usaha beroperasi minimal 1 tahun</span>
+                    <p className="text-blue-200 text-sm mt-1">Memiliki track record operasional yang dapat diverifikasi</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle className="w-5 h-5 text-green-400 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <span className="text-white font-medium">Memiliki izin usaha yang berlaku</span>
+                    <p className="text-blue-200 text-sm mt-1">SIUP, TDP, NPWP, dan izin usaha sesuai bidang</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle className="w-5 h-5 text-green-400 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <span className="text-white font-medium">Tidak dalam proses pailit/likuidasi</span>
+                    <p className="text-blue-200 text-sm mt-1">Status perusahaan aktif dan sehat secara hukum</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <CheckCircle className="w-5 h-5 text-green-400 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <span className="text-white font-medium">Laporan keuangan dapat dipertanggungjawabkan</span>
+                    <p className="text-blue-200 text-sm mt-1">Audit atau review oleh akuntan publik</p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center">
-                <CheckCircle className="w-4 h-4 text-green-400 mr-2 flex-shrink-0" />
-                <span>Tidak dalam proses pailit/likuidasi</span>
-              </div>
-              <div className="flex items-center">
-                <CheckCircle className="w-4 h-4 text-green-400 mr-2 flex-shrink-0" />
-                <span>Laporan keuangan dapat dipertanggungjawabkan</span>
+
+              <div className="mt-6 pt-6 border-t border-white/20">
+                <div className="text-center">
+                  <p className="text-blue-200 text-sm mb-2">Tingkat Kepuasan Klien</p>
+                  <div className="flex justify-center items-center space-x-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star key={star} className="w-5 h-5 text-yellow-400 fill-current" />
+                    ))}
+                    <span className="text-white font-semibold ml-2">4.9/5.0</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
