@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import HeroSection from '@/components/HeroSection';
 import StatsSection from '@/components/StatsSection';
 import StepperForm from '@/components/StepperForm';
+import { Toaster } from '@/components/ui/toaster';
 
 const Index = () => {
   return (
@@ -59,6 +60,7 @@ const Index = () => {
           </div>
         </div>
       </div>
+      <Toaster />
     </SidebarProvider>
   );
 };

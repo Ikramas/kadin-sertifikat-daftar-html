@@ -1,9 +1,109 @@
-import React from 'react';
+
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, FileText, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { documentUploadSchema, DocumentUploadData } from '@/lib/validationSchemas';
+import { useFormContext } from '@/contexts/FormContext';
+import { toast } from '@/hooks/use-toast';
 
-const DocumentUploadForm = () => {
+interface DocumentUploadFormProps {
+  onValidation?: (isValid: boolean) => void;
+}
+
+interface UploadedFile {
+  name: string;
+  size: number;
+  type: string;
+}
+
+const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({ onValidation }) => {
+  const { documentUpload, setDocumentUpload } = useFormContext();
+  const [uploadedFiles, setUploadedFiles] = useState<Record<string, UploadedFile>>({});
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    setValue,
+    watch
+  } = useForm<DocumentUploadData>({
+    resolver: zodResolver(documentUploadSchema),
+    defaultValues: documentUpload,
+    mode: 'onChange'
+  });
+
+  React.useEffect(() => {
+    onValidation?.(isValid);
+  }, [isValid, onValidation]);
+
+  const watchedValues = watch();
+  React.useEffect(() => {
+    setDocumentUpload(watchedValues);
+  }, [watchedValues, setDocumentUpload]);
+
+  const handleFileUpload = (fieldName: string, files: FileList | null) => {
+    if (files && files[0]) {
+      const file = files[0];
+      
+      // Validate file size (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File Terlalu Besar",
+          description: "Ukuran file maksimal 5MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file type
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        toast({
+          title: "Format File Tidak Valid",
+          description: "Hanya file PDF, JPG, JPEG, dan PNG yang diperbolehkan",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setUploadedFiles(prev => ({
+        ...prev,
+        [fieldName]: {
+          name: file.name,
+          size: file.size,
+          type: file.type
+        }
+      }));
+
+      setValue(fieldName as keyof DocumentUploadData, files);
+      
+      toast({
+        title: "File Berhasil Diupload",
+        description: `${file.name} berhasil diupload`,
+      });
+    }
+  };
+
+  const removeFile = (fieldName: string) => {
+    setUploadedFiles(prev => {
+      const newFiles = { ...prev };
+      delete newFiles[fieldName];
+      return newFiles;
+    });
+    setValue(fieldName as keyof DocumentUploadData, undefined);
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   const documents = [
     {
       id: 'aktaPendirian',
@@ -61,6 +161,10 @@ const DocumentUploadForm = () => {
     }
   ];
 
+  const requiredDocs = documents.filter(doc => doc.required);
+  const uploadedRequiredCount = requiredDocs.filter(doc => uploadedFiles[doc.id]).length;
+  const totalUploaded = Object.keys(uploadedFiles).length;
+
   return (
     <div className="group relative">
       <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
@@ -78,7 +182,7 @@ const DocumentUploadForm = () => {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {documents.map((doc) => (
             <div key={doc.id} className="group/upload relative">
               <Label className={`flex items-center text-gray-700 font-semibold mb-3 ${doc.color}`}>
@@ -86,40 +190,70 @@ const DocumentUploadForm = () => {
                 {doc.title} {doc.required && <span className="text-red-500 ml-1">*</span>}
               </Label>
               
-              <div className={`relative border-3 border-dashed ${doc.borderColor} rounded-2xl p-6 text-center hover:border-opacity-60 transition-all duration-300 ${doc.bgColor} group-hover/upload:shadow-lg`}>
-                <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent rounded-2xl"></div>
-                
-                <div className="relative z-10">
-                  <div className={`w-16 h-16 mx-auto mb-4 ${doc.bgColor} rounded-2xl flex items-center justify-center shadow-lg group-hover/upload:scale-110 transition-transform duration-300`}>
-                    <Upload className={`w-8 h-8 ${doc.color}`} />
+              {uploadedFiles[doc.id] ? (
+                <div className={`relative border-2 ${doc.borderColor} rounded-2xl p-4 ${doc.bgColor} border-solid`}>
+                  <div className="flex items-center justify-between mb-2">
+                    <CheckCircle className="w-8 h-8 text-green-600" />
+                    <button
+                      type="button"
+                      onClick={() => removeFile(doc.id)}
+                      className="text-red-500 hover:text-red-700 transition-colors"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
                   </div>
-                  
-                  <Input 
-                    type="file" 
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    className="hidden"
-                    id={doc.id}
-                  />
-                  
-                  <Label 
-                    htmlFor={doc.id} 
-                    className={`cursor-pointer ${doc.color} hover:opacity-80 transition-opacity font-semibold text-sm block mb-2`}
-                  >
-                    Klik untuk upload atau drag & drop
-                  </Label>
-                  
-                  <p className="text-xs text-gray-500">
-                    PDF, JPG, PNG (Max 5MB)
-                  </p>
-                  
-                  {doc.required && (
-                    <div className="mt-3 flex items-center justify-center text-xs text-red-600">
-                      <AlertCircle className="w-3 h-3 mr-1" />
-                      Wajib diisi
-                    </div>
-                  )}
+                  <div className="text-sm">
+                    <p className="font-medium text-gray-800 truncate">{uploadedFiles[doc.id].name}</p>
+                    <p className="text-gray-600">{formatFileSize(uploadedFiles[doc.id].size)}</p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className={`relative border-3 border-dashed ${doc.borderColor} rounded-2xl p-6 text-center hover:border-opacity-60 transition-all duration-300 ${doc.bgColor} group-hover/upload:shadow-lg ${
+                  errors[doc.id as keyof DocumentUploadData] ? 'border-red-500 bg-red-50' : ''
+                }`}>
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent rounded-2xl"></div>
+                  
+                  <div className="relative z-10">
+                    <div className={`w-16 h-16 mx-auto mb-4 ${doc.bgColor} rounded-2xl flex items-center justify-center shadow-lg group-hover/upload:scale-110 transition-transform duration-300`}>
+                      <Upload className={`w-8 h-8 ${doc.color}`} />
+                    </div>
+                    
+                    <Input 
+                      type="file" 
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      className="hidden"
+                      id={doc.id}
+                      {...register(doc.id as keyof DocumentUploadData)}
+                      onChange={(e) => handleFileUpload(doc.id, e.target.files)}
+                    />
+                    
+                    <Label 
+                      htmlFor={doc.id} 
+                      className={`cursor-pointer ${doc.color} hover:opacity-80 transition-opacity font-semibold text-sm block mb-2`}
+                    >
+                      Klik untuk upload atau drag & drop
+                    </Label>
+                    
+                    <p className="text-xs text-gray-500">
+                      PDF, JPG, PNG (Max 5MB)
+                    </p>
+                    
+                    {doc.required && (
+                      <div className="mt-3 flex items-center justify-center text-xs text-red-600">
+                        <AlertCircle className="w-3 h-3 mr-1" />
+                        Wajib diisi
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              {errors[doc.id as keyof DocumentUploadData] && (
+                <div className="flex items-center mt-2 text-red-600 text-sm">
+                  <AlertCircle className="w-4 h-4 mr-1" />
+                  {errors[doc.id as keyof DocumentUploadData]?.message}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -128,19 +262,19 @@ const DocumentUploadForm = () => {
           <div className="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-2xl p-4 text-center">
             <AlertCircle className="w-8 h-8 text-red-600 mx-auto mb-2" />
             <div className="text-sm font-semibold text-red-800">Belum Upload</div>
-            <div className="text-xs text-red-600">6 dokumen</div>
+            <div className="text-xs text-red-600">{requiredDocs.length - uploadedRequiredCount} dokumen wajib</div>
           </div>
           
           <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 border border-yellow-200 rounded-2xl p-4 text-center">
             <Upload className="w-8 h-8 text-yellow-600 mx-auto mb-2" />
-            <div className="text-sm font-semibold text-yellow-800">Sedang Upload</div>
-            <div className="text-xs text-yellow-600">0 dokumen</div>
+            <div className="text-sm font-semibold text-yellow-800">Progress</div>
+            <div className="text-xs text-yellow-600">{uploadedRequiredCount}/{requiredDocs.length} wajib</div>
           </div>
           
           <div className="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-2xl p-4 text-center">
             <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
-            <div className="text-sm font-semibold text-green-800">Berhasil Upload</div>
-            <div className="text-xs text-green-600">0 dokumen</div>
+            <div className="text-sm font-semibold text-green-800">Total Upload</div>
+            <div className="text-xs text-green-600">{totalUploaded} dokumen</div>
           </div>
         </div>
 

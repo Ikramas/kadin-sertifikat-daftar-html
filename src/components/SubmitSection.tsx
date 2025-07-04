@@ -1,10 +1,66 @@
+
 import React from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Send, Shield, Save, CheckCircle, Clock, Award } from 'lucide-react';
+import { Send, Shield, Save, CheckCircle, Clock, Award, AlertCircle } from 'lucide-react';
+import { submitSchema, SubmitData } from '@/lib/validationSchemas';
+import { useFormContext } from '@/contexts/FormContext';
+import { toast } from '@/hooks/use-toast';
 
-const SubmitSection = () => {
+interface SubmitSectionProps {
+  onValidation?: (isValid: boolean) => void;
+  onFinalSubmit?: () => void;
+}
+
+const SubmitSection: React.FC<SubmitSectionProps> = ({ onValidation, onFinalSubmit }) => {
+  const { submitInfo, setSubmitInfo, companyInfo, directorInfo, resetForm } = useFormContext();
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+    setValue,
+    watch
+  } = useForm<SubmitData>({
+    resolver: zodResolver(submitSchema),
+    defaultValues: submitInfo,
+    mode: 'onChange'
+  });
+
+  React.useEffect(() => {
+    onValidation?.(isValid);
+  }, [isValid, onValidation]);
+
+  const watchedValues = watch();
+  React.useEffect(() => {
+    setSubmitInfo(watchedValues);
+  }, [watchedValues, setSubmitInfo]);
+
+  const onSubmit = (data: SubmitData) => {
+    console.log('Final submission data:', {
+      companyInfo,
+      directorInfo,
+      submitInfo: data
+    });
+    
+    toast({
+      title: "Aplikasi Berhasil Dikirim!",
+      description: "Aplikasi sertifikat Anda telah berhasil dikirim. Anda akan menerima email konfirmasi dalam 1x24 jam.",
+    });
+    
+    onFinalSubmit?.();
+  };
+
+  const handleSaveDraft = () => {
+    toast({
+      title: "Draft Tersimpan",
+      description: "Data Anda telah disimpan sebagai draft",
+    });
+  };
+
   return (
     <div className="group relative">
       <div className="absolute -inset-0.5 bg-gradient-to-r from-green-600 to-emerald-600 rounded-3xl blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
@@ -22,82 +78,127 @@ const SubmitSection = () => {
           </div>
         </div>
         
-        <div className="space-y-6 mb-8">
-          <div className="group/check flex items-start space-x-4 p-4 rounded-2xl border-2 border-gray-100 hover:border-green-200 hover:bg-green-50/30 transition-all duration-300">
-            <Checkbox id="terms" className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600" />
-            <Label htmlFor="terms" className="text-sm leading-relaxed text-gray-700 cursor-pointer">
-              <span className="font-semibold text-gray-800">Pernyataan Kebenaran Data:</span> Saya menyatakan bahwa semua informasi yang saya berikan adalah benar dan akurat. 
-              Saya memahami bahwa memberikan informasi palsu dapat mengakibatkan penolakan aplikasi 
-              atau pencabutan sertifikat yang telah diterbitkan.
-            </Label>
-          </div>
-
-          <div className="group/check flex items-start space-x-4 p-4 rounded-2xl border-2 border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all duration-300">
-            <Checkbox id="privacy" className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600" />
-            <Label htmlFor="privacy" className="text-sm leading-relaxed text-gray-700 cursor-pointer">
-              <span className="font-semibold text-gray-800">Kebijakan Privasi:</span> Saya setuju dengan kebijakan privasi dan syarat & ketentuan KADIN Indonesia 
-              terkait penggunaan data pribadi dan perusahaan untuk proses sertifikasi.
-            </Label>
-          </div>
-
-          <div className="group/check flex items-start space-x-4 p-4 rounded-2xl border-2 border-gray-100 hover:border-purple-200 hover:bg-purple-50/30 transition-all duration-300">
-            <Checkbox id="contact" className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600" />
-            <Label htmlFor="contact" className="text-sm leading-relaxed text-gray-700 cursor-pointer">
-              <span className="font-semibold text-gray-800">Izin Komunikasi:</span> Saya memberikan izin kepada KADIN Indonesia untuk menghubungi saya melalui 
-              email atau telepon terkait proses aplikasi sertifikat ini.
-            </Label>
-          </div>
-        </div>
-
-        <div className="mb-8 bg-gradient-to-r from-green-50 via-blue-50 to-purple-50 rounded-2xl border-2 border-green-200 p-6">
-          <div className="flex items-start space-x-4">
-            <div className="bg-green-100 p-2 rounded-xl">
-              <Shield className="w-6 h-6 text-green-600" />
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-6 mb-8">
+            <div className="group/check flex items-start space-x-4 p-4 rounded-2xl border-2 border-gray-100 hover:border-green-200 hover:bg-green-50/30 transition-all duration-300">
+              <Checkbox 
+                id="terms" 
+                {...register('terms')}
+                onCheckedChange={(checked) => setValue('terms', !!checked)}
+                className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600" 
+              />
+              <div className="flex-1">
+                <Label htmlFor="terms" className="text-sm leading-relaxed text-gray-700 cursor-pointer">
+                  <span className="font-semibold text-gray-800">Pernyataan Kebenaran Data:</span> Saya menyatakan bahwa semua informasi yang saya berikan adalah benar dan akurat. 
+                  Saya memahami bahwa memberikan informasi palsu dapat mengakibatkan penolakan aplikasi 
+                  atau pencabutan sertifikat yang telah diterbitkan.
+                </Label>
+                {errors.terms && (
+                  <div className="flex items-center mt-2 text-red-600 text-sm">
+                    <AlertCircle className="w-4 h-4 mr-1" />
+                    {errors.terms.message}
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="flex-1">
-              <h4 className="font-semibold text-green-800 mb-3 flex items-center">
-                <CheckCircle className="w-5 h-5 mr-2" />
-                Jaminan Keamanan Data
-              </h4>
-              <p className="text-sm text-green-700 mb-4">
-                Semua data yang Anda berikan akan dienkripsi dan disimpan dengan aman sesuai 
-                standar keamanan internasional. Data hanya akan digunakan untuk proses sertifikasi 
-                dan tidak akan dibagikan kepada pihak ketiga tanpa persetujuan.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                <div className="flex items-center text-green-700">
-                  <Shield className="w-4 h-4 mr-2" />
-                  <span>SSL 256-bit Encryption</span>
-                </div>
-                <div className="flex items-center text-green-700">
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  <span>ISO 27001 Certified</span>
-                </div>
-                <div className="flex items-center text-green-700">
-                  <Award className="w-4 h-4 mr-2" />
-                  <span>GDPR Compliant</span>
+
+            <div className="group/check flex items-start space-x-4 p-4 rounded-2xl border-2 border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-all duration-300">
+              <Checkbox 
+                id="privacy" 
+                {...register('privacy')}
+                onCheckedChange={(checked) => setValue('privacy', !!checked)}
+                className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600" 
+              />
+              <div className="flex-1">
+                <Label htmlFor="privacy" className="text-sm leading-relaxed text-gray-700 cursor-pointer">
+                  <span className="font-semibold text-gray-800">Kebijakan Privasi:</span> Saya setuju dengan kebijakan privasi dan syarat & ketentuan KADIN Indonesia 
+                  terkait penggunaan data pribadi dan perusahaan untuk proses sertifikasi.
+                </Label>
+                {errors.privacy && (
+                  <div className="flex items-center mt-2 text-red-600 text-sm">
+                    <AlertCircle className="w-4 h-4 mr-1" />
+                    {errors.privacy.message}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="group/check flex items-start space-x-4 p-4 rounded-2xl border-2 border-gray-100 hover:border-purple-200 hover:bg-purple-50/30 transition-all duration-300">
+              <Checkbox 
+                id="contact" 
+                {...register('contact')}
+                onCheckedChange={(checked) => setValue('contact', !!checked)}
+                className="mt-1 data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600" 
+              />
+              <div className="flex-1">
+                <Label htmlFor="contact" className="text-sm leading-relaxed text-gray-700 cursor-pointer">
+                  <span className="font-semibold text-gray-800">Izin Komunikasi:</span> Saya memberikan izin kepada KADIN Indonesia untuk menghubungi saya melalui 
+                  email atau telepon terkait proses aplikasi sertifikat ini.
+                </Label>
+                {errors.contact && (
+                  <div className="flex items-center mt-2 text-red-600 text-sm">
+                    <AlertCircle className="w-4 h-4 mr-1" />
+                    {errors.contact.message}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-8 bg-gradient-to-r from-green-50 via-blue-50 to-purple-50 rounded-2xl border-2 border-green-200 p-6">
+            <div className="flex items-start space-x-4">
+              <div className="bg-green-100 p-2 rounded-xl">
+                <Shield className="w-6 h-6 text-green-600" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-semibold text-green-800 mb-3 flex items-center">
+                  <CheckCircle className="w-5 h-5 mr-2" />
+                  Jaminan Keamanan Data
+                </h4>
+                <p className="text-sm text-green-700 mb-4">
+                  Semua data yang Anda berikan akan dienkripsi dan disimpan dengan aman sesuai 
+                  standar keamanan internasional. Data hanya akan digunakan untuk proses sertifikasi 
+                  dan tidak akan dibagikan kepada pihak ketiga tanpa persetujuan.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                  <div className="flex items-center text-green-700">
+                    <Shield className="w-4 h-4 mr-2" />
+                    <span>SSL 256-bit Encryption</span>
+                  </div>
+                  <div className="flex items-center text-green-700">
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    <span>ISO 27001 Certified</span>
+                  </div>
+                  <div className="flex items-center text-green-700">
+                    <Award className="w-4 h-4 mr-2" />
+                    <span>GDPR Compliant</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <Button 
-            variant="outline" 
-            className="flex-1 h-14 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 rounded-xl font-semibold text-base transition-all duration-300 group/btn"
-          >
-            <Save className="w-5 h-5 mr-2 group-hover/btn:scale-110 transition-transform duration-300" />
-            Simpan Draft
-          </Button>
-          
-          <Button 
-            className="flex-1 h-14 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300 group/btn"
-          >
-            <Send className="w-5 h-5 mr-2 group-hover/btn:scale-110 transition-transform duration-300" />
-            Ajukan Sertifikat Sekarang
-          </Button>
-        </div>
+          <div className="flex flex-col sm:flex-row gap-4 mb-8">
+            <Button 
+              type="button"
+              variant="outline" 
+              onClick={handleSaveDraft}
+              className="flex-1 h-14 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 rounded-xl font-semibold text-base transition-all duration-300 group/btn"
+            >
+              <Save className="w-5 h-5 mr-2 group-hover/btn:scale-110 transition-transform duration-300" />
+              Simpan Draft
+            </Button>
+            
+            <Button 
+              type="submit"
+              disabled={!isValid}
+              className="flex-1 h-14 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300 group/btn disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Send className="w-5 h-5 mr-2 group-hover/btn:scale-110 transition-transform duration-300" />
+              Ajukan Sertifikat Sekarang
+            </Button>
+          </div>
+        </form>
 
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
           <h4 className="font-semibold text-blue-800 mb-4 text-center">Tahapan Setelah Pengajuan</h4>
@@ -126,7 +227,6 @@ const SubmitSection = () => {
           </div>
         </div>
 
-        {/* Final progress indicator */}
         <div className="mt-8 pt-6 border-t border-gray-200">
           <div className="flex justify-between items-center text-sm text-gray-600">
             <span className="font-semibold text-green-600">Langkah 4 dari 4 - Siap untuk diajukan!</span>
