@@ -62,7 +62,6 @@ const StepperFormContent = () => {
 
   const goToStep = (step: number) => {
     if (isDisabled) return;
-    // Only allow going to completed steps or current step
     if (step <= currentStep || stepValidations[step - 1]) {
       setCurrentStep(step);
     }
@@ -71,10 +70,9 @@ const StepperFormContent = () => {
   const handleFinalSubmit = () => {
     toast({
       title: "🎉 Aplikasi Berhasil Dikirim!",
-      description: "Terima kasih! Aplikasi sertifikat Anda sedang diproses. Kami akan menghubungi Anda segera.",
+      description: "Terima kasih! Aplikasi sertifikat Anda sedang diproses.",
     });
     
-    // Go back to step 1 to show the submitted form
     setTimeout(() => {
       setCurrentStep(1);
     }, 2000);
@@ -89,8 +87,6 @@ const StepperFormContent = () => {
   };
 
   const handleEditApplication = () => {
-    // This would typically be controlled by admin action
-    // For demo, we'll simulate allowing edits
     toast({
       title: "Mode Edit Diaktifkan",
       description: "Anda dapat mengedit aplikasi sekarang",
@@ -116,58 +112,55 @@ const StepperFormContent = () => {
     );
   };
 
-  // Show status banner if application has been submitted
   const showStatusBanner = applicationStatus.status !== 'draft';
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-5xl mx-auto p-4">
       {/* Status Banner */}
       {showStatusBanner && (
-        <VerificationStatusBanner 
-          status={applicationStatus} 
-          onEdit={handleEditApplication}
-        />
+        <>
+          <VerificationStatusBanner 
+            status={applicationStatus} 
+            onEdit={handleEditApplication}
+          />
+          <div className="mb-6">
+            <Button
+              variant="outline"
+              onClick={handleBackToHome}
+              className="flex items-center space-x-2"
+            >
+              <Home className="w-4 h-4" />
+              <span>Kembali ke Beranda</span>
+            </Button>
+          </div>
+        </>
       )}
 
-      {/* Back to Home Button */}
-      {showStatusBanner && (
-        <div className="mb-6">
-          <Button
-            variant="outline"
-            onClick={handleBackToHome}
-            className="flex items-center space-x-2 hover:bg-gray-50"
-          >
-            <Home className="w-4 h-4" />
-            <span>Kembali ke Beranda</span>
-          </Button>
-        </div>
-      )}
-
-      {/* Enhanced Progress indicator */}
-      <div className="mb-12">
-        <div className="flex items-center justify-center space-x-4 mb-8">
+      {/* Progress Steps */}
+      <div className="mb-8">
+        <div className="flex items-center justify-center space-x-2 md:space-x-4 mb-6">
           {steps.map((step, index) => (
             <React.Fragment key={step.number}>
               <div className="flex items-center">
                 <div 
-                  className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
+                  className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-all duration-300 ${
                     isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'
                   } ${
                     currentStep === step.number 
-                      ? 'bg-blue-600 text-white shadow-lg scale-110' 
+                      ? 'bg-blue-600 text-white scale-110' 
                       : stepValidations[step.number] || currentStep > step.number
-                      ? 'bg-green-600 text-white shadow-md hover:scale-105'
-                      : 'bg-gray-300 text-gray-600 hover:bg-gray-400 hover:scale-105'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-300 text-gray-600'
                   } ${isDisabled ? 'opacity-50' : ''}`}
                   onClick={() => goToStep(step.number)}
                 >
                   {stepValidations[step.number] || (currentStep > step.number && step.number !== currentStep) ? (
-                    <CheckCircle className="w-6 h-6" />
+                    <CheckCircle className="w-4 h-4 md:w-5 md:h-5" />
                   ) : (
                     step.number
                   )}
                 </div>
-                <span className={`ml-3 font-medium transition-colors duration-300 ${
+                <span className={`hidden md:block ml-2 font-medium text-sm transition-colors duration-300 ${
                   currentStep === step.number 
                     ? 'text-blue-600' 
                     : stepValidations[step.number] || currentStep > step.number
@@ -178,7 +171,7 @@ const StepperFormContent = () => {
                 </span>
               </div>
               {index < steps.length - 1 && (
-                <div className={`w-16 h-1 rounded-full transition-colors duration-500 ${
+                <div className={`w-8 md:w-12 h-1 rounded-full transition-colors duration-500 ${
                   stepValidations[step.number] || currentStep > step.number ? 'bg-green-400' : 'bg-gray-200'
                 }`}></div>
               )}
@@ -186,9 +179,9 @@ const StepperFormContent = () => {
           ))}
         </div>
         
-        {/* Step counter */}
+        {/* Step Counter */}
         <div className="text-center">
-          <div className="inline-flex items-center bg-white/80 backdrop-blur-sm rounded-full px-6 py-2 shadow-lg border border-white/50">
+          <div className="inline-flex items-center bg-white rounded-full px-4 py-2 shadow-lg border">
             <span className="text-sm font-semibold text-gray-600">
               Langkah {currentStep} dari {totalSteps}
             </span>
@@ -199,35 +192,33 @@ const StepperFormContent = () => {
         </div>
       </div>
 
-      {/* Current step content with animation */}
-      <div className="relative">
-        <div className="transform transition-all duration-500 ease-in-out">
-          {renderCurrentStep()}
-        </div>
+      {/* Current Step Content */}
+      <div className="mb-8">
+        {renderCurrentStep()}
       </div>
 
-      {/* Navigation buttons */}
+      {/* Navigation Buttons */}
       {!showStatusBanner && (
-        <div className="flex justify-between items-center mt-12 px-8">
+        <div className="flex justify-between items-center px-4">
           <Button
             variant="outline"
             onClick={prevStep}
             disabled={currentStep === 1 || isDisabled}
-            className={`h-14 px-8 rounded-xl font-semibold text-base transition-all duration-300 ${
+            className={`h-12 px-6 font-semibold ${
               currentStep === 1 || isDisabled
                 ? 'opacity-50 cursor-not-allowed' 
-                : 'border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 hover:scale-105 shadow-lg hover:shadow-xl'
+                : 'hover:bg-gray-50'
             }`}
           >
-            <ChevronLeft className="w-5 h-5 mr-2" />
+            <ChevronLeft className="w-4 h-4 mr-2" />
             Sebelumnya
           </Button>
 
-          <div className="flex space-x-2">
+          <div className="flex space-x-1">
             {steps.map((step) => (
               <div
                 key={step.number}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
                   currentStep === step.number 
                     ? 'bg-blue-600 scale-125' 
                     : stepValidations[step.number] || currentStep > step.number
@@ -242,26 +233,26 @@ const StepperFormContent = () => {
             <Button
               onClick={nextStep}
               disabled={(!stepValidations[currentStep] && applicationStatus.status === 'draft') || isDisabled}
-              className={`h-14 px-8 rounded-xl font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 ${
+              className={`h-12 px-6 font-semibold ${
                 (stepValidations[currentStep] || applicationStatus.status !== 'draft') && !isDisabled
-                  ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white'
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
                   : 'bg-gray-400 text-gray-200 cursor-not-allowed'
               }`}
             >
               Selanjutnya
-              <ChevronRight className="w-5 h-5 ml-2" />
+              <ChevronRight className="w-4 h-4 ml-2" />
             </Button>
           ) : (
-            <div className="w-32"></div>
+            <div className="w-24"></div>
           )}
         </div>
       )}
 
-      {/* Progress bar */}
-      <div className="mt-8">
-        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+      {/* Progress Bar */}
+      <div className="mt-6">
+        <div className="w-full bg-gray-200 rounded-full h-2">
           <div 
-            className="h-full bg-gradient-to-r from-blue-500 to-green-500 rounded-full transition-all duration-700 ease-out"
+            className="h-full bg-gradient-to-r from-blue-500 to-green-500 rounded-full transition-all duration-700"
             style={{ width: `${(currentStep / totalSteps) * 100}%` }}
           ></div>
         </div>

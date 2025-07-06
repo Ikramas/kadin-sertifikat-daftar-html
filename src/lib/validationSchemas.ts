@@ -21,23 +21,21 @@ export const directorInfoSchema = z.object({
   directorEmail: z.string().email('Format email tidak valid'),
 });
 
+// Simplified document upload schema - validation is handled in component
 export const documentUploadSchema = z.object({
-  aktaPendirian: z.any().optional().refine((files) => {
-    return files === undefined || files?.length > 0;
-  }, 'Akta pendirian wajib diupload'),
-  npwpDoc: z.any().optional().refine((files) => {
-    return files === undefined || files?.length > 0;
-  }, 'NPWP wajib diupload'),
-  nibDoc: z.any().optional().refine((files) => {
-    return files === undefined || files?.length > 0;
-  }, 'NIB wajib diupload'),
-  ktpDirector: z.any().optional().refine((files) => {
-    return files === undefined || files?.length > 0;
-  }, 'KTP Direktur wajib diupload'),
-  domisiliDoc: z.any().optional().refine((files) => {
-    return files === undefined || files?.length > 0;
-  }, 'Surat domisili wajib diupload'),
+  aktaPendirian: z.any().optional(),
+  npwpDoc: z.any().optional(),
+  nibDoc: z.any().optional(),
+  ktpDirector: z.any().optional(),
+  domisiliDoc: z.any().optional(),
   financialReport: z.any().optional(),
+}).refine((data) => {
+  // Check if required documents are uploaded
+  const requiredFields = ['aktaPendirian', 'npwpDoc', 'nibDoc', 'ktpDirector', 'domisiliDoc'];
+  return requiredFields.every(field => data[field as keyof typeof data]);
+}, {
+  message: "Semua dokumen wajib harus diupload",
+  path: ["root"]
 });
 
 export const submitSchema = z.object({
