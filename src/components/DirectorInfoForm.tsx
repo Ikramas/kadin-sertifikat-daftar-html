@@ -50,204 +50,200 @@ const DirectorInfoForm: React.FC<DirectorInfoFormProps> = ({ onValidation }) => 
   };
 
   return (
-    <div className="group relative">
-      <div className="absolute -inset-0.5 bg-gradient-to-r from-green-600 to-blue-600 rounded-3xl blur opacity-20 group-hover:opacity-30 transition duration-300"></div>
+    <div className="bg-white rounded-lg shadow-sm p-6 border">
+      <div className="flex items-center mb-6">
+        <div className="bg-green-600 p-2 rounded-lg mr-3">
+          <User className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <h2 className="text-xl font-bold text-green-800">
+            Informasi Pimpinan/Direktur
+          </h2>
+          <p className="text-gray-600 text-sm">
+            {isDisabled ? 'Data pimpinan yang telah disubmit' : 'Data lengkap pimpinan atau direktur perusahaan'}
+          </p>
+        </div>
+      </div>
       
-      <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50">
-        <div className="flex items-center mb-6">
-          <div className="bg-gradient-to-br from-green-500 to-green-600 p-3 rounded-2xl mr-4 shadow-lg">
-            <User className="w-6 h-6 text-white" />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="directorName" className="flex items-center text-gray-700 font-medium mb-2">
+                <User className="w-4 h-4 mr-2 text-blue-600" />
+                Nama Lengkap Direktur *
+              </Label>
+              <Input 
+                id="directorName"
+                {...register('directorName')}
+                placeholder="Masukkan nama lengkap direktur"
+                disabled={isDisabled}
+                className={`h-11 ${
+                  isDisabled ? 'bg-gray-100 cursor-not-allowed' : ''
+                } ${
+                  errors.directorName ? 'border-red-500' : ''
+                }`}
+              />
+              {errors.directorName && (
+                <div className="flex items-center mt-1 text-red-600 text-sm">
+                  <AlertCircle className="w-4 h-4 mr-1" />
+                  {errors.directorName.message}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="directorPosition" className="flex items-center text-gray-700 font-medium mb-2">
+                <Briefcase className="w-4 h-4 mr-2 text-purple-600" />
+                Jabatan *
+              </Label>
+              <Select 
+                onValueChange={(value) => setValue('directorPosition', value)} 
+                defaultValue={directorInfo.directorPosition}
+                disabled={isDisabled}
+              >
+                <SelectTrigger className={`h-11 ${
+                  isDisabled ? 'bg-gray-100 cursor-not-allowed' : ''
+                } ${
+                  errors.directorPosition ? 'border-red-500' : ''
+                }`}>
+                  <SelectValue placeholder="Pilih jabatan" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="direktur">Direktur Utama</SelectItem>
+                  <SelectItem value="presdir">Presiden Direktur</SelectItem>
+                  <SelectItem value="komisaris">Komisaris Utama</SelectItem>
+                  <SelectItem value="pemilik">Pemilik</SelectItem>
+                  <SelectItem value="ceo">CEO</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.directorPosition && (
+                <div className="flex items-center mt-1 text-red-600 text-sm">
+                  <AlertCircle className="w-4 h-4 mr-1" />
+                  {errors.directorPosition.message}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="directorKtp" className="flex items-center text-gray-700 font-medium mb-2">
+                <CreditCard className="w-4 h-4 mr-2 text-orange-600" />
+                Nomor KTP *
+              </Label>
+              <Input 
+                id="directorKtp"
+                {...register('directorKtp')}
+                placeholder="Masukkan nomor KTP (16 digit)"
+                maxLength={16}
+                disabled={isDisabled}
+                className={`h-11 ${
+                  isDisabled ? 'bg-gray-100 cursor-not-allowed' : ''
+                } ${
+                  errors.directorKtp ? 'border-red-500' : ''
+                }`}
+              />
+              {errors.directorKtp && (
+                <div className="flex items-center mt-1 text-red-600 text-sm">
+                  <AlertCircle className="w-4 h-4 mr-1" />
+                  {errors.directorKtp.message}
+                </div>
+              )}
+            </div>
           </div>
-          <div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-green-800 to-green-900 bg-clip-text text-transparent">
-              Informasi Pimpinan/Direktur
-            </h2>
-            <p className="text-gray-600 mt-1">
-              {isDisabled ? 'Data pimpinan yang telah disubmit' : 'Data lengkap pimpinan atau direktur perusahaan'}
-            </p>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="directorBirth" className="flex items-center text-gray-700 font-medium mb-2">
+                <Calendar className="w-4 h-4 mr-2 text-red-600" />
+                Tanggal Lahir *
+              </Label>
+              <Input 
+                id="directorBirth"
+                type="date"
+                {...register('directorBirth')}
+                disabled={isDisabled}
+                className={`h-11 ${
+                  isDisabled ? 'bg-gray-100 cursor-not-allowed' : ''
+                } ${
+                  errors.directorBirth ? 'border-red-500' : ''
+                }`}
+              />
+              {errors.directorBirth && (
+                <div className="flex items-center mt-1 text-red-600 text-sm">
+                  <AlertCircle className="w-4 h-4 mr-1" />
+                  {errors.directorBirth.message}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="directorPhone" className="flex items-center text-gray-700 font-medium mb-2">
+                <Phone className="w-4 h-4 mr-2 text-green-600" />
+                Nomor Telepon *
+              </Label>
+              <Input 
+                id="directorPhone"
+                {...register('directorPhone')}
+                placeholder="Masukkan nomor telepon aktif"
+                disabled={isDisabled}
+                className={`h-11 ${
+                  isDisabled ? 'bg-gray-100 cursor-not-allowed' : ''
+                } ${
+                  errors.directorPhone ? 'border-red-500' : ''
+                }`}
+              />
+              {errors.directorPhone && (
+                <div className="flex items-center mt-1 text-red-600 text-sm">
+                  <AlertCircle className="w-4 h-4 mr-1" />
+                  {errors.directorPhone.message}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <Label htmlFor="directorEmail" className="flex items-center text-gray-700 font-medium mb-2">
+                <Mail className="w-4 h-4 mr-2 text-blue-600" />
+                Email *
+              </Label>
+              <Input 
+                id="directorEmail"
+                type="email"
+                {...register('directorEmail')}
+                placeholder="Masukkan alamat email aktif"
+                disabled={isDisabled}
+                className={`h-11 ${
+                  isDisabled ? 'bg-gray-100 cursor-not-allowed' : ''
+                } ${
+                  errors.directorEmail ? 'border-red-500' : ''
+                }`}
+              />
+              {errors.directorEmail && (
+                <div className="flex items-center mt-1 text-red-600 text-sm">
+                  <AlertCircle className="w-4 h-4 mr-1" />
+                  {errors.directorEmail.message}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-        
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <div className="group/field">
-                <Label htmlFor="directorName" className="flex items-center text-gray-700 font-semibold mb-3">
-                  <User className="w-4 h-4 mr-2 text-blue-600" />
-                  Nama Lengkap Direktur *
-                </Label>
-                <Input 
-                  id="directorName"
-                  {...register('directorName')}
-                  placeholder="Masukkan nama lengkap direktur"
-                  disabled={isDisabled}
-                  className={`h-12 border-2 rounded-xl transition-all duration-300 ${
-                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
-                  } ${
-                    errors.directorName ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-500'
-                  }`}
-                />
-                {errors.directorName && (
-                  <div className="flex items-center mt-2 text-red-600 text-sm">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.directorName.message}
-                  </div>
-                )}
-              </div>
 
-              <div className="group/field">
-                <Label htmlFor="directorPosition" className="flex items-center text-gray-700 font-semibold mb-3">
-                  <Briefcase className="w-4 h-4 mr-2 text-purple-600" />
-                  Jabatan *
-                </Label>
-                <Select 
-                  onValueChange={(value) => setValue('directorPosition', value)} 
-                  defaultValue={directorInfo.directorPosition}
-                  disabled={isDisabled}
-                >
-                  <SelectTrigger className={`h-12 border-2 rounded-xl ${
-                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
-                  } ${
-                    errors.directorPosition ? 'border-red-500' : 'border-gray-200'
-                  }`}>
-                    <SelectValue placeholder="Pilih jabatan" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl border-2 shadow-2xl">
-                    <SelectItem value="direktur">Direktur Utama</SelectItem>
-                    <SelectItem value="presdir">Presiden Direktur</SelectItem>
-                    <SelectItem value="komisaris">Komisaris Utama</SelectItem>
-                    <SelectItem value="pemilik">Pemilik</SelectItem>
-                    <SelectItem value="ceo">CEO</SelectItem>
-                  </SelectContent>
-                </Select>
-                {errors.directorPosition && (
-                  <div className="flex items-center mt-2 text-red-600 text-sm">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.directorPosition.message}
-                  </div>
-                )}
-              </div>
-
-              <div className="group/field">
-                <Label htmlFor="directorKtp" className="flex items-center text-gray-700 font-semibold mb-3">
-                  <CreditCard className="w-4 h-4 mr-2 text-orange-600" />
-                  Nomor KTP *
-                </Label>
-                <Input 
-                  id="directorKtp"
-                  {...register('directorKtp')}
-                  placeholder="Masukkan nomor KTP (16 digit)"
-                  maxLength={16}
-                  disabled={isDisabled}
-                  className={`h-12 border-2 rounded-xl transition-all duration-300 ${
-                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
-                  } ${
-                    errors.directorKtp ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-500'
-                  }`}
-                />
-                {errors.directorKtp && (
-                  <div className="flex items-center mt-2 text-red-600 text-sm">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.directorKtp.message}
-                  </div>
-                )}
-              </div>
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="flex items-start">
+            <div className="bg-green-100 p-2 rounded-lg mr-3">
+              <User className="w-4 h-4 text-green-600" />
             </div>
-
-            <div className="space-y-6">
-              <div className="group/field">
-                <Label htmlFor="directorBirth" className="flex items-center text-gray-700 font-semibold mb-3">
-                  <Calendar className="w-4 h-4 mr-2 text-red-600" />
-                  Tanggal Lahir *
-                </Label>
-                <Input 
-                  id="directorBirth"
-                  type="date"
-                  {...register('directorBirth')}
-                  disabled={isDisabled}
-                  className={`h-12 border-2 rounded-xl transition-all duration-300 ${
-                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
-                  } ${
-                    errors.directorBirth ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-500'
-                  }`}
-                />
-                {errors.directorBirth && (
-                  <div className="flex items-center mt-2 text-red-600 text-sm">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.directorBirth.message}
-                  </div>
-                )}
-              </div>
-
-              <div className="group/field">
-                <Label htmlFor="directorPhone" className="flex items-center text-gray-700 font-semibold mb-3">
-                  <Phone className="w-4 h-4 mr-2 text-green-600" />
-                  Nomor Telepon *
-                </Label>
-                <Input 
-                  id="directorPhone"
-                  {...register('directorPhone')}
-                  placeholder="Masukkan nomor telepon aktif"
-                  disabled={isDisabled}
-                  className={`h-12 border-2 rounded-xl transition-all duration-300 ${
-                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
-                  } ${
-                    errors.directorPhone ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-500'
-                  }`}
-                />
-                {errors.directorPhone && (
-                  <div className="flex items-center mt-2 text-red-600 text-sm">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.directorPhone.message}
-                  </div>
-                )}
-              </div>
-
-              <div className="group/field">
-                <Label htmlFor="directorEmail" className="flex items-center text-gray-700 font-semibold mb-3">
-                  <Mail className="w-4 h-4 mr-2 text-blue-600" />
-                  Email *
-                </Label>
-                <Input 
-                  id="directorEmail"
-                  type="email"
-                  {...register('directorEmail')}
-                  placeholder="Masukkan alamat email aktif"
-                  disabled={isDisabled}
-                  className={`h-12 border-2 rounded-xl transition-all duration-300 ${
-                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
-                  } ${
-                    errors.directorEmail ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-500'
-                  }`}
-                />
-                {errors.directorEmail && (
-                  <div className="flex items-center mt-2 text-red-600 text-sm">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.directorEmail.message}
-                  </div>
-                )}
-              </div>
+            <div>
+              <h4 className="font-medium text-green-800 mb-2">Informasi Penting</h4>
+              <ul className="text-sm text-green-700 space-y-1">
+                <li>• Pastikan data direktur sesuai dengan dokumen resmi</li>
+                <li>• Email dan nomor telepon akan digunakan untuk komunikasi</li>
+                <li>• Nomor KTP harus valid dan masih berlaku</li>
+                <li>• Data akan diverifikasi dengan dokumen yang diupload</li>
+              </ul>
             </div>
           </div>
-
-          <div className="mt-8 bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-2xl p-6">
-            <div className="flex items-start">
-              <div className="bg-green-100 p-2 rounded-xl mr-4">
-                <User className="w-5 h-5 text-green-600" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-green-800 mb-2">Informasi Penting</h4>
-                <ul className="text-sm text-green-700 space-y-1">
-                  <li>• Pastikan data direktur sesuai dengan dokumen resmi</li>
-                  <li>• Email dan nomor telepon akan digunakan untuk komunikasi</li>
-                  <li>• Nomor KTP harus valid dan masih berlaku</li>
-                  <li>• Data akan diverifikasi dengan dokumen yang diupload</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
   );
 };
