@@ -22,11 +22,21 @@ export const directorInfoSchema = z.object({
 });
 
 export const documentUploadSchema = z.object({
-  aktaPendirian: z.any().refine((files) => files?.length > 0, 'Akta pendirian wajib diupload'),
-  npwpDoc: z.any().refine((files) => files?.length > 0, 'NPWP wajib diupload'),
-  nibDoc: z.any().refine((files) => files?.length > 0, 'NIB wajib diupload'),
-  ktpDirector: z.any().refine((files) => files?.length > 0, 'KTP Direktur wajib diupload'),
-  domisiliDoc: z.any().refine((files) => files?.length > 0, 'Surat domisili wajib diupload'),
+  aktaPendirian: z.any().optional().refine((files) => {
+    return files === undefined || files?.length > 0;
+  }, 'Akta pendirian wajib diupload'),
+  npwpDoc: z.any().optional().refine((files) => {
+    return files === undefined || files?.length > 0;
+  }, 'NPWP wajib diupload'),
+  nibDoc: z.any().optional().refine((files) => {
+    return files === undefined || files?.length > 0;
+  }, 'NIB wajib diupload'),
+  ktpDirector: z.any().optional().refine((files) => {
+    return files === undefined || files?.length > 0;
+  }, 'KTP Direktur wajib diupload'),
+  domisiliDoc: z.any().optional().refine((files) => {
+    return files === undefined || files?.length > 0;
+  }, 'Surat domisili wajib diupload'),
   financialReport: z.any().optional(),
 });
 

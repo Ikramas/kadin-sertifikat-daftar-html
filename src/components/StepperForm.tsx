@@ -97,7 +97,24 @@ const StepperFormContent = () => {
     });
   };
 
-  const CurrentStepComponent = steps[currentStep - 1].component;
+  const renderCurrentStep = () => {
+    const CurrentStepComponent = steps[currentStep - 1].component;
+    
+    if (currentStep === 4) {
+      return (
+        <CurrentStepComponent 
+          onValidation={(isValid: boolean) => handleStepValidation(currentStep, isValid)}
+          onFinalSubmit={handleFinalSubmit}
+        />
+      );
+    }
+    
+    return (
+      <CurrentStepComponent 
+        onValidation={(isValid: boolean) => handleStepValidation(currentStep, isValid)}
+      />
+    );
+  };
 
   // Show status banner if application has been submitted
   const showStatusBanner = applicationStatus.status !== 'draft';
@@ -185,10 +202,7 @@ const StepperFormContent = () => {
       {/* Current step content with animation */}
       <div className="relative">
         <div className="transform transition-all duration-500 ease-in-out">
-          <CurrentStepComponent 
-            onValidation={(isValid: boolean) => handleStepValidation(currentStep, isValid)}
-            onFinalSubmit={currentStep === 4 ? handleFinalSubmit : undefined}
-          />
+          {renderCurrentStep()}
         </div>
       </div>
 
