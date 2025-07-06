@@ -115,7 +115,7 @@ const StepperFormContent = () => {
   const showStatusBanner = applicationStatus.status !== 'draft';
 
   return (
-    <div className="max-w-5xl mx-auto p-4">
+    <div className="max-w-4xl mx-auto p-3">
       {/* Status Banner */}
       {showStatusBanner && (
         <>
@@ -123,7 +123,7 @@ const StepperFormContent = () => {
             status={applicationStatus} 
             onEdit={handleEditApplication}
           />
-          <div className="mb-6">
+          <div className="mb-4">
             <Button
               variant="outline"
               onClick={handleBackToHome}
@@ -137,13 +137,13 @@ const StepperFormContent = () => {
       )}
 
       {/* Progress Steps */}
-      <div className="mb-8">
-        <div className="flex items-center justify-center space-x-2 md:space-x-4 mb-6">
+      <div className="mb-6">
+        <div className="flex items-center justify-center space-x-2 md:space-x-4 mb-4">
           {steps.map((step, index) => (
             <React.Fragment key={step.number}>
               <div className="flex items-center">
                 <div 
-                  className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-xs md:text-sm transition-all duration-300 ${
+                  className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300 ${
                     isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'
                   } ${
                     currentStep === step.number 
@@ -155,7 +155,7 @@ const StepperFormContent = () => {
                   onClick={() => goToStep(step.number)}
                 >
                   {stepValidations[step.number] || (currentStep > step.number && step.number !== currentStep) ? (
-                    <CheckCircle className="w-4 h-4 md:w-5 md:h-5" />
+                    <CheckCircle className="w-4 h-4" />
                   ) : (
                     step.number
                   )}
@@ -181,7 +181,7 @@ const StepperFormContent = () => {
         
         {/* Step Counter */}
         <div className="text-center">
-          <div className="inline-flex items-center bg-white rounded-full px-4 py-2 shadow-lg border">
+          <div className="inline-flex items-center bg-white rounded-full px-3 py-1 shadow-lg border">
             <span className="text-sm font-semibold text-gray-600">
               Langkah {currentStep} dari {totalSteps}
             </span>
@@ -193,18 +193,18 @@ const StepperFormContent = () => {
       </div>
 
       {/* Current Step Content */}
-      <div className="mb-8">
+      <div className="mb-6">
         {renderCurrentStep()}
       </div>
 
       {/* Navigation Buttons */}
       {!showStatusBanner && (
-        <div className="flex justify-between items-center px-4">
+        <div className="flex justify-between items-center px-2">
           <Button
             variant="outline"
             onClick={prevStep}
             disabled={currentStep === 1 || isDisabled}
-            className={`h-12 px-6 font-semibold ${
+            className={`h-10 px-4 font-semibold ${
               currentStep === 1 || isDisabled
                 ? 'opacity-50 cursor-not-allowed' 
                 : 'hover:bg-gray-50'
@@ -233,7 +233,7 @@ const StepperFormContent = () => {
             <Button
               onClick={nextStep}
               disabled={(!stepValidations[currentStep] && applicationStatus.status === 'draft') || isDisabled}
-              className={`h-12 px-6 font-semibold ${
+              className={`h-10 px-4 font-semibold ${
                 (stepValidations[currentStep] || applicationStatus.status !== 'draft') && !isDisabled
                   ? 'bg-blue-600 hover:bg-blue-700 text-white'
                   : 'bg-gray-400 text-gray-200 cursor-not-allowed'
@@ -243,13 +243,13 @@ const StepperFormContent = () => {
               <ChevronRight className="w-4 h-4 ml-2" />
             </Button>
           ) : (
-            <div className="w-24"></div>
+            <div className="w-20"></div>
           )}
         </div>
       )}
 
       {/* Progress Bar */}
-      <div className="mt-6">
+      <div className="mt-4">
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div 
             className="h-full bg-gradient-to-r from-blue-500 to-green-500 rounded-full transition-all duration-700"

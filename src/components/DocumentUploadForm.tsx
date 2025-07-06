@@ -77,12 +77,12 @@ const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({ onValidation })
       type: file.type
     };
 
-    setLocalFiles(prev => ({
+    setLocalFiles((prev) => ({
       ...prev,
       [fieldName]: fileData
     }));
 
-    setUploadedFiles(prev => ({
+    setUploadedFiles((prev) => ({
       ...prev,
       [fieldName]: {
         name: file.name,
@@ -91,7 +91,7 @@ const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({ onValidation })
       }
     }));
 
-    setValue(fieldName as keyof DocumentUploadData, files);
+    setValue(fieldName as keyof DocumentUploadData, file);
     
     toast({
       title: "File Berhasil Diupload",
@@ -102,13 +102,13 @@ const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({ onValidation })
   const removeFile = (fieldName: string) => {
     if (isDisabled) return;
 
-    setLocalFiles(prev => {
+    setLocalFiles((prev) => {
       const newFiles = { ...prev };
       delete newFiles[fieldName];
       return newFiles;
     });
 
-    setUploadedFiles(prev => {
+    setUploadedFiles((prev) => {
       const newFiles = { ...prev };
       delete newFiles[fieldName];
       return newFiles;
@@ -181,22 +181,22 @@ const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({ onValidation })
   const totalUploaded = Object.keys(localFiles).length + Object.keys(uploadedFiles).length;
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl p-6 md:p-8 border">
-      <div className="flex items-center mb-6">
-        <div className="bg-purple-600 p-3 rounded-2xl mr-4">
-          <Upload className="w-6 h-6 text-white" />
+    <div className="bg-white rounded-3xl shadow-xl p-4 md:p-6 border">
+      <div className="flex items-center mb-4">
+        <div className="bg-purple-600 p-2 rounded-xl mr-3">
+          <Upload className="w-5 h-5 text-white" />
         </div>
         <div>
-          <h2 className="text-xl md:text-2xl font-bold text-purple-800">
+          <h2 className="text-lg md:text-xl font-bold text-purple-800">
             Upload Dokumen Persyaratan
           </h2>
-          <p className="text-gray-600 text-sm md:text-base">
+          <p className="text-gray-600 text-sm">
             {isDisabled ? 'Dokumen yang telah diupload' : 'Upload semua dokumen yang diperlukan'}
           </p>
         </div>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
         {documents.map((doc) => {
           const hasFile = localFiles[doc.id] || uploadedFiles[doc.id];
           const fileData = localFiles[doc.id] || uploadedFiles[doc.id];
@@ -209,9 +209,9 @@ const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({ onValidation })
               </Label>
               
               {hasFile ? (
-                <div className={`border-2 ${doc.borderColor} rounded-2xl p-4 ${doc.bgColor}`}>
+                <div className={`border-2 ${doc.borderColor} rounded-xl p-3 ${doc.bgColor}`}>
                   <div className="flex items-center justify-between mb-2">
-                    <CheckCircle className="w-6 h-6 text-green-600" />
+                    <CheckCircle className="w-5 h-5 text-green-600" />
                     {!isDisabled && (
                       <button
                         type="button"
@@ -232,11 +232,11 @@ const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({ onValidation })
                   </div>
                 </div>
               ) : (
-                <div className={`border-2 border-dashed ${doc.borderColor} rounded-2xl p-4 text-center ${doc.bgColor} ${
+                <div className={`border-2 border-dashed ${doc.borderColor} rounded-xl p-3 text-center ${doc.bgColor} ${
                   errors[doc.id as keyof DocumentUploadData] ? 'border-red-500 bg-red-50' : ''
                 } ${isDisabled ? 'opacity-50' : 'hover:border-opacity-60'}`}>
-                  <div className={`w-12 h-12 mx-auto mb-3 ${doc.bgColor} rounded-xl flex items-center justify-center`}>
-                    <Upload className={`w-6 h-6 ${doc.color}`} />
+                  <div className={`w-10 h-10 mx-auto mb-2 ${doc.bgColor} rounded-lg flex items-center justify-center`}>
+                    <Upload className={`w-5 h-5 ${doc.color}`} />
                   </div>
                   
                   {!isDisabled && (
@@ -252,7 +252,7 @@ const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({ onValidation })
                       
                       <Label 
                         htmlFor={doc.id} 
-                        className={`cursor-pointer ${doc.color} hover:opacity-80 font-semibold text-sm block mb-2`}
+                        className={`cursor-pointer ${doc.color} hover:opacity-80 font-semibold text-sm block mb-1`}
                       >
                         Klik untuk upload
                       </Label>
@@ -279,7 +279,7 @@ const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({ onValidation })
               )}
               
               {errors[doc.id as keyof DocumentUploadData] && (
-                <div className="flex items-center mt-2 text-red-600 text-sm">
+                <div className="flex items-center mt-1 text-red-600 text-sm">
                   <AlertCircle className="w-4 h-4 mr-1" />
                   <span>{String(errors[doc.id as keyof DocumentUploadData]?.message)}</span>
                 </div>
@@ -290,60 +290,60 @@ const DocumentUploadForm: React.FC<DocumentUploadFormProps> = ({ onValidation })
       </div>
 
       {/* Progress Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-center">
-          <AlertCircle className="w-6 h-6 text-red-600 mx-auto mb-1" />
-          <div className="text-sm font-semibold text-red-800">Belum Upload</div>
-          <div className="text-xs text-red-600">{requiredDocs.length - uploadedRequiredCount} dokumen wajib</div>
+      <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-2 text-center">
+          <AlertCircle className="w-4 h-4 text-red-600 mx-auto mb-1" />
+          <div className="text-xs font-semibold text-red-800">Belum Upload</div>
+          <div className="text-xs text-red-600">{requiredDocs.length - uploadedRequiredCount}</div>
         </div>
         
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-3 text-center">
-          <Upload className="w-6 h-6 text-yellow-600 mx-auto mb-1" />
-          <div className="text-sm font-semibold text-yellow-800">Progress</div>
-          <div className="text-xs text-yellow-600">{uploadedRequiredCount}/{requiredDocs.length} wajib</div>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 text-center">
+          <Upload className="w-4 h-4 text-yellow-600 mx-auto mb-1" />
+          <div className="text-xs font-semibold text-yellow-800">Progress</div>
+          <div className="text-xs text-yellow-600">{uploadedRequiredCount}/{requiredDocs.length}</div>
         </div>
         
-        <div className="bg-green-50 border border-green-200 rounded-xl p-3 text-center">
-          <CheckCircle className="w-6 h-6 text-green-600 mx-auto mb-1" />
-          <div className="text-sm font-semibold text-green-800">Total Upload</div>
-          <div className="text-xs text-green-600">{totalUploaded} dokumen</div>
+        <div className="bg-green-50 border border-green-200 rounded-lg p-2 text-center">
+          <CheckCircle className="w-4 h-4 text-green-600 mx-auto mb-1" />
+          <div className="text-xs font-semibold text-green-800">Total</div>
+          <div className="text-xs text-green-600">{totalUploaded}</div>
         </div>
       </div>
 
       {/* Info */}
-      <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
         <div className="flex items-start">
-          <div className="bg-blue-100 p-2 rounded-lg mr-3">
-            <FileText className="w-4 h-4 text-blue-600" />
+          <div className="bg-blue-100 p-1 rounded mr-2">
+            <FileText className="w-3 h-3 text-blue-600" />
           </div>
           <div>
-            <h4 className="font-semibold text-blue-800 mb-2">Catatan Penting</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-blue-700">
+            <h4 className="font-semibold text-blue-800 mb-1 text-sm">Catatan Penting</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-1 text-xs text-blue-700">
               <div className="space-y-1">
                 <div className="flex items-center">
-                  <CheckCircle className="w-3 h-3 mr-2 text-green-600" />
+                  <CheckCircle className="w-3 h-3 mr-1 text-green-600" />
                   <span>Dokumen (*) wajib diupload</span>
                 </div>
                 <div className="flex items-center">
-                  <CheckCircle className="w-3 h-3 mr-2 text-green-600" />
+                  <CheckCircle className="w-3 h-3 mr-1 text-green-600" />
                   <span>Format: PDF, JPG, JPEG, PNG</span>
                 </div>
                 <div className="flex items-center">
-                  <CheckCircle className="w-3 h-3 mr-2 text-green-600" />
+                  <CheckCircle className="w-3 h-3 mr-1 text-green-600" />
                   <span>Ukuran maksimal: 5MB</span>
                 </div>
               </div>
               <div className="space-y-1">
                 <div className="flex items-center">
-                  <CheckCircle className="w-3 h-3 mr-2 text-green-600" />
+                  <CheckCircle className="w-3 h-3 mr-1 text-green-600" />
                   <span>Dokumen jelas dan terbaca</span>
                 </div>
                 <div className="flex items-center">
-                  <CheckCircle className="w-3 h-3 mr-2 text-green-600" />
+                  <CheckCircle className="w-3 h-3 mr-1 text-green-600" />
                   <span>Dokumen masih berlaku</span>
                 </div>
                 <div className="flex items-center">
-                  <CheckCircle className="w-3 h-3 mr-2 text-green-600" />
+                  <CheckCircle className="w-3 h-3 mr-1 text-green-600" />
                   <span>Scan resolusi tinggi</span>
                 </div>
               </div>
