@@ -40,3 +40,13 @@ export type CompanyInfoData = z.infer<typeof companyInfoSchema>;
 export type DirectorInfoData = z.infer<typeof directorInfoSchema>;
 export type DocumentUploadData = z.infer<typeof documentUploadSchema>;
 export type SubmitData = z.infer<typeof submitSchema>;
+
+export type VerificationStatus = 'draft' | 'submitted' | 'under_review' | 'revision_needed' | 'approved' | 'rejected';
+
+export interface ApplicationStatus {
+  status: VerificationStatus;
+  submittedAt?: Date;
+  reviewedAt?: Date;
+  comments?: string;
+  canEdit: boolean;
+}

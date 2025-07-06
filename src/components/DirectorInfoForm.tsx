@@ -15,7 +15,8 @@ interface DirectorInfoFormProps {
 }
 
 const DirectorInfoForm: React.FC<DirectorInfoFormProps> = ({ onValidation }) => {
-  const { directorInfo, setDirectorInfo } = useFormContext();
+  const { directorInfo, setDirectorInfo, applicationStatus } = useFormContext();
+  const isDisabled = !applicationStatus.canEdit;
   
   const {
     register,
@@ -40,10 +41,12 @@ const DirectorInfoForm: React.FC<DirectorInfoFormProps> = ({ onValidation }) => 
 
   const onSubmit = (data: DirectorInfoData) => {
     setDirectorInfo(data);
-    toast({
-      title: "Data Tersimpan",
-      description: "Informasi direktur berhasil disimpan",
-    });
+    if (!isDisabled) {
+      toast({
+        title: "Data Tersimpan",
+        description: "Informasi direktur berhasil disimpan",
+      });
+    }
   };
 
   return (
@@ -59,7 +62,9 @@ const DirectorInfoForm: React.FC<DirectorInfoFormProps> = ({ onValidation }) => 
             <h2 className="text-2xl font-bold bg-gradient-to-r from-green-800 to-green-900 bg-clip-text text-transparent">
               Informasi Pimpinan/Direktur
             </h2>
-            <p className="text-gray-600 mt-1">Data lengkap pimpinan atau direktur perusahaan</p>
+            <p className="text-gray-600 mt-1">
+              {isDisabled ? 'Data pimpinan yang telah disubmit' : 'Data lengkap pimpinan atau direktur perusahaan'}
+            </p>
           </div>
         </div>
         
@@ -75,7 +80,10 @@ const DirectorInfoForm: React.FC<DirectorInfoFormProps> = ({ onValidation }) => 
                   id="directorName"
                   {...register('directorName')}
                   placeholder="Masukkan nama lengkap direktur"
-                  className={`h-12 border-2 rounded-xl transition-all duration-300 bg-white/80 hover:bg-white ${
+                  disabled={isDisabled}
+                  className={`h-12 border-2 rounded-xl transition-all duration-300 ${
+                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
+                  } ${
                     errors.directorName ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-500'
                   }`}
                 />
@@ -92,8 +100,14 @@ const DirectorInfoForm: React.FC<DirectorInfoFormProps> = ({ onValidation }) => 
                   <Briefcase className="w-4 h-4 mr-2 text-purple-600" />
                   Jabatan *
                 </Label>
-                <Select onValueChange={(value) => setValue('directorPosition', value)} defaultValue={directorInfo.directorPosition}>
-                  <SelectTrigger className={`h-12 border-2 rounded-xl bg-white/80 hover:bg-white ${
+                <Select 
+                  onValueChange={(value) => setValue('directorPosition', value)} 
+                  defaultValue={directorInfo.directorPosition}
+                  disabled={isDisabled}
+                >
+                  <SelectTrigger className={`h-12 border-2 rounded-xl ${
+                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
+                  } ${
                     errors.directorPosition ? 'border-red-500' : 'border-gray-200'
                   }`}>
                     <SelectValue placeholder="Pilih jabatan" />
@@ -124,7 +138,10 @@ const DirectorInfoForm: React.FC<DirectorInfoFormProps> = ({ onValidation }) => 
                   {...register('directorKtp')}
                   placeholder="Masukkan nomor KTP (16 digit)"
                   maxLength={16}
-                  className={`h-12 border-2 rounded-xl transition-all duration-300 bg-white/80 hover:bg-white ${
+                  disabled={isDisabled}
+                  className={`h-12 border-2 rounded-xl transition-all duration-300 ${
+                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
+                  } ${
                     errors.directorKtp ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-500'
                   }`}
                 />
@@ -147,7 +164,10 @@ const DirectorInfoForm: React.FC<DirectorInfoFormProps> = ({ onValidation }) => 
                   id="directorBirth"
                   type="date"
                   {...register('directorBirth')}
-                  className={`h-12 border-2 rounded-xl transition-all duration-300 bg-white/80 hover:bg-white ${
+                  disabled={isDisabled}
+                  className={`h-12 border-2 rounded-xl transition-all duration-300 ${
+                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
+                  } ${
                     errors.directorBirth ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-500'
                   }`}
                 />
@@ -168,7 +188,10 @@ const DirectorInfoForm: React.FC<DirectorInfoFormProps> = ({ onValidation }) => 
                   id="directorPhone"
                   {...register('directorPhone')}
                   placeholder="Masukkan nomor telepon aktif"
-                  className={`h-12 border-2 rounded-xl transition-all duration-300 bg-white/80 hover:bg-white ${
+                  disabled={isDisabled}
+                  className={`h-12 border-2 rounded-xl transition-all duration-300 ${
+                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
+                  } ${
                     errors.directorPhone ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-500'
                   }`}
                 />
@@ -190,7 +213,10 @@ const DirectorInfoForm: React.FC<DirectorInfoFormProps> = ({ onValidation }) => 
                   type="email"
                   {...register('directorEmail')}
                   placeholder="Masukkan alamat email aktif"
-                  className={`h-12 border-2 rounded-xl transition-all duration-300 bg-white/80 hover:bg-white ${
+                  disabled={isDisabled}
+                  className={`h-12 border-2 rounded-xl transition-all duration-300 ${
+                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
+                  } ${
                     errors.directorEmail ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-green-500'
                   }`}
                 />

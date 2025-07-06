@@ -16,7 +16,8 @@ interface CompanyInfoFormProps {
 }
 
 const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onValidation }) => {
-  const { companyInfo, setCompanyInfo } = useFormContext();
+  const { companyInfo, setCompanyInfo, applicationStatus } = useFormContext();
+  const isDisabled = !applicationStatus.canEdit;
   
   const {
     register,
@@ -42,10 +43,12 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onValidation }) => {
 
   const onSubmit = (data: CompanyInfoData) => {
     setCompanyInfo(data);
-    toast({
-      title: "Data Tersimpan",
-      description: "Informasi perusahaan berhasil disimpan",
-    });
+    if (!isDisabled) {
+      toast({
+        title: "Data Tersimpan",
+        description: "Informasi perusahaan berhasil disimpan",
+      });
+    }
   };
 
   return (
@@ -61,7 +64,9 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onValidation }) => {
             <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-800 to-blue-900 bg-clip-text text-transparent">
               Informasi Perusahaan
             </h2>
-            <p className="text-gray-600 mt-1">Data lengkap perusahaan yang akan didaftarkan</p>
+            <p className="text-gray-600 mt-1">
+              {isDisabled ? 'Data perusahaan yang telah disubmit' : 'Data lengkap perusahaan yang akan didaftarkan'}
+            </p>
           </div>
         </div>
         
@@ -77,7 +82,10 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onValidation }) => {
                   id="companyName"
                   {...register('companyName')}
                   placeholder="Masukkan nama lengkap perusahaan"
-                  className={`h-12 border-2 rounded-xl transition-all duration-300 bg-white/80 hover:bg-white ${
+                  disabled={isDisabled}
+                  className={`h-12 border-2 rounded-xl transition-all duration-300 ${
+                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
+                  } ${
                     errors.companyName ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'
                   }`}
                 />
@@ -94,8 +102,14 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onValidation }) => {
                   <Briefcase className="w-4 h-4 mr-2 text-purple-600" />
                   Jenis Perusahaan *
                 </Label>
-                <Select onValueChange={(value) => setValue('companyType', value)} defaultValue={companyInfo.companyType}>
-                  <SelectTrigger className={`h-12 border-2 rounded-xl bg-white/80 hover:bg-white ${
+                <Select 
+                  onValueChange={(value) => setValue('companyType', value)} 
+                  defaultValue={companyInfo.companyType}
+                  disabled={isDisabled}
+                >
+                  <SelectTrigger className={`h-12 border-2 rounded-xl ${
+                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
+                  } ${
                     errors.companyType ? 'border-red-500' : 'border-gray-200'
                   }`}>
                     <SelectValue placeholder="Pilih jenis perusahaan" />
@@ -126,7 +140,10 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onValidation }) => {
                   type="number"
                   {...register('establishedYear', { valueAsNumber: true })}
                   placeholder="Tahun perusahaan didirikan"
-                  className={`h-12 border-2 rounded-xl transition-all duration-300 bg-white/80 hover:bg-white ${
+                  disabled={isDisabled}
+                  className={`h-12 border-2 rounded-xl transition-all duration-300 ${
+                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
+                  } ${
                     errors.establishedYear ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'
                   }`}
                 />
@@ -143,8 +160,14 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onValidation }) => {
                   <Users className="w-4 h-4 mr-2 text-orange-600" />
                   Jumlah Karyawan *
                 </Label>
-                <Select onValueChange={(value) => setValue('employeeCount', value)} defaultValue={companyInfo.employeeCount}>
-                  <SelectTrigger className={`h-12 border-2 rounded-xl bg-white/80 hover:bg-white ${
+                <Select 
+                  onValueChange={(value) => setValue('employeeCount', value)} 
+                  defaultValue={companyInfo.employeeCount}
+                  disabled={isDisabled}
+                >
+                  <SelectTrigger className={`h-12 border-2 rounded-xl ${
+                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
+                  } ${
                     errors.employeeCount ? 'border-red-500' : 'border-gray-200'
                   }`}>
                     <SelectValue placeholder="Pilih rentang jumlah karyawan" />
@@ -176,7 +199,10 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onValidation }) => {
                   id="address"
                   {...register('address')}
                   placeholder="Masukkan alamat lengkap perusahaan"
-                  className={`min-h-[120px] border-2 rounded-xl transition-all duration-300 bg-white/80 hover:bg-white ${
+                  disabled={isDisabled}
+                  className={`min-h-[120px] border-2 rounded-xl transition-all duration-300 ${
+                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
+                  } ${
                     errors.address ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'
                   }`}
                 />
@@ -197,7 +223,10 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onValidation }) => {
                   id="phone"
                   {...register('phone')}
                   placeholder="Masukkan nomor telepon perusahaan"
-                  className={`h-12 border-2 rounded-xl transition-all duration-300 bg-white/80 hover:bg-white ${
+                  disabled={isDisabled}
+                  className={`h-12 border-2 rounded-xl transition-all duration-300 ${
+                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
+                  } ${
                     errors.phone ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'
                   }`}
                 />
@@ -219,7 +248,10 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onValidation }) => {
                   type="email"
                   {...register('email')}
                   placeholder="Masukkan email resmi perusahaan"
-                  className={`h-12 border-2 rounded-xl transition-all duration-300 bg-white/80 hover:bg-white ${
+                  disabled={isDisabled}
+                  className={`h-12 border-2 rounded-xl transition-all duration-300 ${
+                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
+                  } ${
                     errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'
                   }`}
                 />
@@ -240,7 +272,10 @@ const CompanyInfoForm: React.FC<CompanyInfoFormProps> = ({ onValidation }) => {
                   id="website"
                   {...register('website')}
                   placeholder="https://www.perusahaan.co.id"
-                  className={`h-12 border-2 rounded-xl transition-all duration-300 bg-white/80 hover:bg-white ${
+                  disabled={isDisabled}
+                  className={`h-12 border-2 rounded-xl transition-all duration-300 ${
+                    isDisabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white/80 hover:bg-white'
+                  } ${
                     errors.website ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-blue-500'
                   }`}
                 />
