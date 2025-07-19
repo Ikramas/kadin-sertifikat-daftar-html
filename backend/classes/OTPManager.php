@@ -44,8 +44,8 @@ class OTPManager {
             $mail->isSMTP();
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'kadin.indonesia.id@gmail.com'; // Ganti dengan email Anda
-            $mail->Password   = 'tekwpzbzsjpbqcuf';    // Ganti dengan app password Gmail Anda
+            $mail->Username   = 'email@email.com'; // Ganti dengan email Anda
+            $mail->Password   = 'janbabnsb';    // Ganti dengan app password Gmail Anda
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
             
