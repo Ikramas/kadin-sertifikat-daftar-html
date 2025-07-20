@@ -50,14 +50,19 @@ try {
     // Mengekstrak data dari request (sesuai nama field dari form React Hook Form)
     $applicationType = $input['applicationType'] ?? ''; 
     $currentSbuNumber = $input['currentSbuNumber'] ?? null; 
-    $businessField = $input['businessField'] ?? ''; 
+    $mainClassificationInput = $input['mainClassificationInput'] ?? ''; // New field name from frontend
+    $bidangName = $input['bidangName'] ?? ''; // Existing field name from frontend, for detailed business field
+    $subBidangCode = $input['subBidangCode'] ?? ''; // Existing field name from frontend
     $companyQualification = $input['companyQualification'] ?? ''; 
     $notes = $input['notes'] ?? null; 
     
     // Bidang NPWP/NIB yang diambil otomatis dari profil perusahaan
-    $npwpPerusahaan = $input['npwp'] ?? '';
-    $npwpPimpinan = $input['leader_npwp'] ?? '';
-    $nib = $input['nib'] ?? '';
+    // Pastikan ini adalah nilai yang diambil dari `company` object di frontend, bukan dari input user.
+    // Jika `npwp`, `leader_npwp`, dan `nib` tidak dikirim dari frontend,
+    // maka Anda perlu mengambilnya dari database di sisi backend.
+    $npwpPerusahaan = $input['npwp'] ?? null;
+    $npwpPimpinan = $input['leader_npwp'] ?? null;
+    $nib = $input['nib'] ?? null;
 
     // Bidang legalitas dan kompetensi baru dari formulir
     $aktaPendirianNotaris = $input['aktaPendirianNotaris'] ?? null;
@@ -68,8 +73,6 @@ try {
     $aktaPerubahanTanggal = $input['aktaPerubahanTanggal'] ?? null; 
     $skKemenkumhamNomorTanggal = $input['skKemenkumhamNomorTanggal'] ?? null;
     $nibDate = $input['nibDate'] ?? null; 
-    $kodeSubbidang = $input['kodeSubbidang'] ?? null; 
-    $bidangName = $input['bidangName'] ?? null;     
 
     // ID dokumen yang di-upload bersamaan dengan form SBU
     $uploadedSbuDocumentIds = $input['uploaded_documents_sbu'] ?? []; 
@@ -81,10 +84,9 @@ try {
         ->custom('applicationType', $applicationType, function($value) {
             return in_array($value, ['new', 'renewal', 'upgrade']);
         }, 'Jenis permohonan tidak valid')
-        // PERBAIKAN: HAPUS VALIDASI requestedClassification DARI SINI
-        // Karena di frontend sudah tidak ada input terpisah untuk ini, 
-        // dan kita akan menggunakan `businessField` sebagai nilai untuk kolom `requested_classification` di DB.
-        ->required('businessField', $businessField, 'Bidang usaha wajib diisi') // PASTI KAN INI ADA
+        ->required('mainClassificationInput', $mainClassificationInput, 'Klasifikasi utama wajib diisi') // Validasi field baru
+        ->required('bidangName', $bidangName, 'Nama bidang usaha wajib diisi') // Validasi field yang sudah ada
+        ->required('subBidangCode', $subBidangCode, 'Kode Subbidang wajib diisi') // Validasi field yang sudah ada
         ->required('companyQualification', $companyQualification, 'Kualifikasi perusahaan wajib dipilih')
         ->custom('companyQualification', $companyQualification, function($value) {
             return in_array($value, ['Kecil', 'Menengah', 'Besar']);
@@ -103,6 +105,7 @@ try {
              ApiResponse::error('Format Tanggal Pendirian tidak valid (YYYY-MM-DD)', 422, ['aktaPendirianTanggal' => 'Format tanggal tidak valid']);
         }
     
+    // Akta Perubahan adalah opsional, jadi validasi hanya jika ada nilai
     if (!empty($aktaPerubahanTanggal) && !DateTime::createFromFormat('Y-m-d', $aktaPerubahanTanggal)) {
         ApiResponse::error('Format Tanggal Perubahan tidak valid (YYYY-MM-DD)', 422, ['aktaPerubahanTanggal' => 'Format tanggal tidak valid']);
     }
@@ -113,29 +116,33 @@ try {
              ApiResponse::error('Format Tanggal NIB tidak valid (YYYY-MM-DD)', 422, ['nibDate' => 'Format tanggal tidak valid']);
         }
     
-    $validator->required('kodeSubbidang', $kodeSubbidang, 'Kode Subbidang wajib diisi');
-    $validator->required('bidangName', $bidangName, 'Nama Bidang Usaha wajib diisi'); 
-
     // Validasi NPWP/NIB dari profil perusahaan (otomatis)
+    // Sebaiknya, ambil ini dari DB berdasarkan user_id daripada mengandalkan frontend untuk mengirimnya
+    // Untuk saat ini, kita validasi jika `input` mengandungnya.
     $validator
         ->required('npwp', $npwpPerusahaan, 'NPWP Perusahaan tidak ditemukan di profil')
         ->required('leader_npwp', $npwpPimpinan, 'NPWP Pimpinan tidak ditemukan di profil')
         ->required('nib', $nib, 'NIB tidak ditemukan di profil');
 
-    $validator->validate(); 
+    $validator->validate();
     
     // Koneksi ke database
     $database = new Database();
     $db = $database->getConnection();
     
     // Mendapatkan data perusahaan user
-    $stmt = $db->prepare("SELECT id, status FROM companies WHERE user_id = ?");
+    $stmt = $db->prepare("SELECT id, status, npwp, nib, leader_npwp FROM companies WHERE user_id = ?");
     $stmt->execute([$currentUser['user_id']]);
     $company = $stmt->fetch();
     
     if (!$company || $company['status'] !== 'verified') {
         ApiResponse::error('Data perusahaan belum terverifikasi atau tidak ditemukan. Silakan hubungi administrator.');
     }
+
+    // Overwrite NPWP/NIB/Leader NPWP with values from DB for consistency, if frontend didn't provide them reliably
+    $npwpPerusahaan = $company['npwp'];
+    $npwpPimpinan = $company['leader_npwp'];
+    $nib = $company['nib'];
     
     // Menghasilkan nomor aplikasi yang unik
     $currentYear = date('Y');
@@ -148,14 +155,15 @@ try {
     $db->beginTransaction();
     
     try {
-        // Memasukkan aplikasi ke database (TERMASUK BIDANG-BIDANG BARU)
+        // Memasukkan aplikasi ke database
+        // PASTIKAN SEMUA KOLOM DI BAWAH INI ADA DI TABEL `applications` DAN URUTANNYA BENAR
         $stmt = $db->prepare("
             INSERT INTO applications (
-                user_id, company_id, application_number, application_type, 
-                current_sbu_number, requested_classification, business_field, 
-                company_qualification, notes, 
+                user_id, company_id, application_number, application_type,
+                current_sbu_number, requested_classification, business_field,
+                company_qualification, notes,
                 
-                -- Kolom baru yang ditambahkan ke tabel applications (PASTIKAN NAMA KOLOM SESUAI DB ANDA)
+                -- Kolom legalitas & kompetensi baru (sesuai skema DB Anda)
                 akta_pendirian_notaris, akta_pendirian_nomor, akta_pendirian_tanggal,
                 akta_perubahan_notaris, akta_perubahan_nomor, akta_perubahan_tanggal,
                 sk_kemenkumham_nomor_tanggal, nib_date, sub_bidang_code, bidang_name,
@@ -163,28 +171,39 @@ try {
 
                 status, created_at
             ) VALUES (
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, 
-                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                 ?, ?, ?,
                 'draft', NOW()
             )
         ");
         $stmt->execute([
-            $currentUser['user_id'], 
-            $company['id'], 
-            $applicationNumber, 
-            $applicationType, 
-            $currentSbuNumber, 
-            $businessField, // <--- MENGGUNAKAN $businessField UNTUK requested_classification di DB
-            $businessField, // <--- MENGGUNAKAN $businessField UNTUK business_field di DB (jika keduanya sama)
-            $companyQualification, 
-            $notes,
-            // Nilai untuk kolom baru (pastikan urutan sesuai dengan kolom di atas)
-            $aktaPendirianNotaris, $aktaPendirianNomor, $aktaPendirianTanggal,
-            $aktaPerubahanNotaris, $aktaPerubahanNomor, $aktaPerubahanTanggal,
-            $skKemenkumhamNomorTanggal, $nibDate, $kodeSubbidang, $bidangName,
-            // Nilai NPWP/NIB dari profil perusahaan (otomatis)
-            $npwpPerusahaan, $npwpPimpinan, $nib
+            $currentUser['user_id'],
+            $company['id'],
+            $applicationNumber,
+            $applicationType,
+            $currentSbuNumber, // Bisa NULL jika applicationType adalah 'new'
+            $mainClassificationInput, // Mapped from frontend new field `mainClassificationInput`
+            $bidangName, // Mapped from frontend `bidangName` to `business_field`
+            $companyQualification,
+            $notes, // Bisa NULL
+
+            // Nilai untuk kolom-kolom legalitas dan kompetensi (pastikan urutan sesuai dengan kolom di atas)
+            $aktaPendirianNotaris,
+            $aktaPendirianNomor,
+            $aktaPendirianTanggal,
+            $aktaPerubahanNotaris, // Bisa NULL
+            $aktaPerubahanNomor, // Bisa NULL
+            $aktaPerubahanTanggal, // Bisa NULL
+            $skKemenkumhamNomorTanggal,
+            $nibDate,
+            $subBidangCode,
+            $bidangName, // Mapped from frontend `bidangName` to `bidang_name`
+
+            // Nilai NPWP/NIB dari profil perusahaan (otomatis dari DB `company` object)
+            $npwpPerusahaan,
+            $npwpPimpinan,
+            $nib
         ]);
         
         $applicationId = $db->lastInsertId();
@@ -197,6 +216,7 @@ try {
             $verifiedDocumentIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
             foreach ($verifiedDocumentIds as $documentId) {
+                // Perbarui `related_application_id` untuk setiap dokumen yang diunggah
                 $stmt = $db->prepare("
                     UPDATE documents SET 
                         category = 'sbu_application', 
