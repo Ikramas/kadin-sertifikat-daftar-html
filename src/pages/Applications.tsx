@@ -4,51 +4,52 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Plus, 
-  FileText, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  AlertTriangle, 
-  Eye, 
-  Download 
+import {
+  Plus,
+  FileText,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Eye,
+  Download,
+  FileCheck // Import for Submit button icon
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate, Link } from 'react-router-dom'; 
+import { useNavigate, Link } from 'react-router-dom';
 
-import { Input } from '@/components/ui/input'; 
-import { Label } from '@/components/ui/label'; 
-import { Textarea } from '@/components/ui/textarea'; 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'; 
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-import { DocumentUploader } from '@/components/documents/DocumentUploader'; 
-import { useDocumentUpload } from '@/hooks/useDocumentUpload'; 
+import { DocumentUploader } from '@/components/documents/DocumentUploader';
+import { useDocumentUpload } from '@/hooks/useDocumentUpload';
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useErrorHandler } from '@/hooks/useErrorHandler'; 
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 interface Application {
   id: string;
   application_number: string;
   application_type: 'new' | 'renewal' | 'upgrade';
   current_sbu_number?: string;
-  requested_classification: string; 
+  requested_classification: string;
   business_field: string;
   company_qualification: 'Kecil' | 'Menengah' | 'Besar';
-  
-  akta_pendirian_notaris?: string; 
-  akta_pendirian_nomor?: string;   
-  akta_pendirian_tanggal?: string; 
-  akta_perubahan_notaris?: string; 
-  akta_perubahan_nomor?: string;   
-  akta_perubahan_tanggal?: string; 
-  sk_kemenkumham_nomor_tanggal?: string; 
-  nib_date?: string;               
-  sub_bidang_code?: string;        
-  bidang_name?: string;            
+
+  akta_pendirian_notaris?: string;
+  akta_pendirian_nomor?: string;
+  akta_pendirian_tanggal?: string;
+  akta_perubahan_notaris?: string;
+  akta_perubahan_nomor?: string;
+  akta_perubahan_tanggal?: string;
+  sk_kemenkumham_nomor_tanggal?: string;
+  nib_date?: string;
+  sub_bidang_code?: string;
+  bidang_name?: string;
 
   status: 'draft' | 'submitted' | 'under_review' | 'approved' | 'rejected' | 'completed';
   submission_date?: string;
@@ -69,29 +70,26 @@ interface ApplicationsResponse {
   total: number;
 }
 
-// PERBAIKAN: Definisi Skema Validasi untuk NewApplicationForm
-// HAPUS 'requestedClassification' karena tidak lagi menjadi input langsung di form
+// Skema Validasi untuk NewApplicationForm
 const newApplicationSchema = z.object({
   applicationType: z.enum(['new', 'renewal', 'upgrade'], { message: 'Jenis permohonan wajib dipilih' }),
-  // requestedClassification DIHAPUS DARI SKEMA INI
-  businessField: z.string().min(1, 'Bidang usaha wajib diisi'), // <--- NAMA INI HARUS KONSISTEN DENGAN INPUT
+  mainClassificationInput: z.string().min(1, 'Klasifikasi utama wajib diisi'), // Renamed for clarity
+  bidangName: z.string().min(1, 'Nama bidang usaha wajib diisi'), // Will map to `business_field` and `bidang_name` in DB
+  subBidangCode: z.string().min(1, 'Kode Subbidang wajib diisi'),
   companyQualification: z.enum(['Kecil', 'Menengah', 'Besar'], { message: 'Kualifikasi perusahaan wajib dipilih' }),
-  currentSbuNumber: z.string().optional(), 
-  notes: z.string().optional(), 
+  currentSbuNumber: z.string().optional(),
+  notes: z.string().optional(),
 
   aktaPendirianNotaris: z.string().min(1, 'Nama Notaris Akta Pendirian wajib diisi'),
   aktaPendirianNomor: z.string().min(1, 'Nomor Akta Pendirian wajib diisi'),
   aktaPendirianTanggal: z.string().min(1, 'Tanggal Pendirian wajib diisi').refine((val) => !isNaN(new Date(val).getTime()), { message: "Format tanggal tidak valid" }),
-  
+
   aktaPerubahanNotaris: z.string().optional(),
   aktaPerubahanNomor: z.string().optional(),
   aktaPerubahanTanggal: z.string().optional().refine((val) => !val || !isNaN(new Date(val).getTime()), { message: "Format tanggal tidak valid" }),
-  
+
   skKemenkumhamNomorTanggal: z.string().min(1, 'Nomor/Tanggal SK Kemenkumham wajib diisi'),
   nibDate: z.string().min(1, 'Tanggal NIB wajib diisi').refine((val) => !isNaN(new Date(val).getTime()), { message: "Format tanggal tidak valid" }),
-
-  kodeSubbidang: z.string().min(1, 'Kode Subbidang wajib diisi'), 
-  bidangName: z.string().min(1, 'Nama Bidang Usaha wajib diisi'), // <--- NAMA INI JUGA HARUS KONSISTEN DENGAN INPUT
 });
 
 type NewApplicationFormInputs = z.infer<typeof newApplicationSchema>;
@@ -99,36 +97,35 @@ type NewApplicationFormInputs = z.infer<typeof newApplicationSchema>;
 const NewApplicationForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, company } = useAuth(); 
-  const { handleError, handleValidationErrors } = useErrorHandler(); 
+  const { user, company } = useAuth();
+  const { handleError, handleValidationErrors } = useErrorHandler();
 
   const {
     register,
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isSubmitting }, 
+    formState: { errors, isSubmitting },
     reset,
   } = useForm<NewApplicationFormInputs>({
     resolver: zodResolver(newApplicationSchema),
     mode: 'onChange',
     defaultValues: {
       applicationType: 'new',
+      mainClassificationInput: '',
+      bidangName: '',
+      subBidangCode: '',
+      companyQualification: 'Kecil',
+      currentSbuNumber: '',
+      notes: '',
       aktaPendirianTanggal: '',
       aktaPerubahanTanggal: '',
       skKemenkumhamNomorTanggal: '',
       nibDate: '',
-      businessField: '', 
-      companyQualification: 'Kecil',
-      kodeSubbidang: '', 
-      bidangName: '', 
-      currentSbuNumber: '',
-      notes: '',
     }
   });
 
   const applicationType = watch('applicationType');
-  const companyQualification = watch('companyQualification'); 
 
   const {
     initializeDocument,
@@ -145,7 +142,6 @@ const NewApplicationForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
 
   const onSubmit = async (data: NewApplicationFormInputs) => {
-    // Tambahkan log untuk melihat data form sebelum validasi dokumen
     console.log("Form data before document check:", data);
 
     const uploadedSbuDocs = getAllUploadedDocuments();
@@ -158,7 +154,7 @@ const NewApplicationForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             description: 'Mohon unggah File Neraca Tahun Terakhir dan File Surat Permohonan SubBidang.',
             variant: 'destructive',
         });
-        return; 
+        return;
     }
 
     try {
@@ -176,16 +172,19 @@ const NewApplicationForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       const documentIdsForBackend = uploadedSbuDocs.map(doc => doc.backendId);
 
       const applicationData = {
-        ...data, 
-        // PERBAIKAN: Mengirim nilai businessField sebagai requested_classification ke backend
-        requested_classification: data.businessField, 
-        npwp: company.npwp,
-        leader_npwp: company.leader_npwp,
-        nib: company.nib,
-        
+        ...data,
+        requested_classification: data.mainClassificationInput, // Mapped to requested_classification
+        business_field: data.bidangName, // Mapped to business_field
+        sub_bidang_code: data.subBidangCode,
+        bidang_name: data.bidangName, // Mapped to bidang_name (Note: redundancy with business_field)
+
+        npwp: company.npwp, // Auto-filled from company data
+        leader_npwp: company.leader_npwp, // Auto-filled from company data
+        nib: company.nib, // Auto-filled from company data
+
         uploaded_documents_sbu: documentIdsForBackend,
-        
-        csrf_token: csrfToken 
+
+        csrf_token: csrfToken
       };
 
       const token = localStorage.getItem('token');
@@ -198,7 +197,7 @@ const NewApplicationForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
-          'X-CSRF-Token': csrfToken, 
+          'X-CSRF-Token': csrfToken,
         },
         body: JSON.stringify(applicationData),
       });
@@ -211,8 +210,8 @@ const NewApplicationForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           description: result.message || `Permohonan SBU dengan nomor ${result.data.application_number} berhasil dibuat dalam status draft.`,
           variant: 'default',
         });
-        onClose(); 
-        navigate('/applications'); 
+        onClose();
+        navigate('/applications');
       } else {
         if (result.details) {
           handleValidationErrors(result.details, 'application_creation');
@@ -241,23 +240,23 @@ const NewApplicationForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         {/* NPWP Perusahaan - Pre-filled & Disabled */}
         <div>
           <Label htmlFor="companyNpwp">NPWP Perusahaan</Label>
-          <Input 
-            id="companyNpwp" 
-            value={company?.npwp || ''} 
-            disabled={true} 
-            readOnly 
-            className="bg-gray-100 opacity-80" 
+          <Input
+            id="companyNpwp"
+            value={company?.npwp || ''}
+            disabled={true}
+            readOnly
+            className="bg-gray-100 opacity-80"
           />
         </div>
 
         {/* NPWP Pimpinan - Pre-filled & Disabled */}
         <div>
-          <Label htmlFor="leaderNpwp">NPWP Pimpinan/Direktur</Label> 
-          <Input 
-            id="leaderNpwp" 
-            value={company?.leader_npwp || ''} 
-            disabled={true} 
-            readOnly 
+          <Label htmlFor="leaderNpwp">NPWP Pimpinan/Direktur</Label>
+          <Input
+            id="leaderNpwp"
+            value={company?.leader_npwp || ''}
+            disabled={true}
+            readOnly
             className="bg-gray-100 opacity-80"
           />
         </div>
@@ -265,11 +264,11 @@ const NewApplicationForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         {/* NIB - Pre-filled & Disabled */}
         <div>
           <Label htmlFor="nib">NIB (Nomor Induk Berusaha)</Label>
-          <Input 
-            id="nib" 
-            value={company?.nib || ''} 
-            disabled={true} 
-            readOnly 
+          <Input
+            id="nib"
+            value={company?.nib || ''}
+            disabled={true}
+            readOnly
             className="bg-gray-100 opacity-80"
           />
         </div>
@@ -279,30 +278,30 @@ const NewApplicationForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <CardTitle className="text-md mb-2">1. Akta Pendirian</CardTitle>
           <div>
             <Label htmlFor="aktaPendirianNotaris">Nama Notaris *</Label>
-            <Input 
-              id="aktaPendirianNotaris" 
-              {...register('aktaPendirianNotaris')} 
+            <Input
+              id="aktaPendirianNotaris"
+              {...register('aktaPendirianNotaris')}
               className={errors.aktaPendirianNotaris ? 'border-destructive' : ''}
-              placeholder="Nama Notaris Akta Pendirian" 
+              placeholder="Nama Notaris Akta Pendirian"
             />
             {errors.aktaPendirianNotaris && <p className="text-sm text-destructive">{errors.aktaPendirianNotaris.message}</p>}
           </div>
           <div>
             <Label htmlFor="aktaPendirianNomor">Nomor Akta *</Label>
-            <Input 
-              id="aktaPendirianNomor" 
-              {...register('aktaPendirianNomor')} 
+            <Input
+              id="aktaPendirianNomor"
+              {...register('aktaPendirianNomor')}
               className={errors.aktaPendirianNomor ? 'border-destructive' : ''}
-              placeholder="Nomor Akta Pendirian" 
+              placeholder="Nomor Akta Pendirian"
             />
             {errors.aktaPendirianNomor && <p className="text-sm text-destructive">{errors.aktaPendirianNomor.message}</p>}
           </div>
           <div>
             <Label htmlFor="aktaPendirianTanggal">Tanggal Pendirian *</Label>
-            <Input 
-              id="aktaPendirianTanggal" 
-              type="date" 
-              {...register('aktaPendirianTanggal')} 
+            <Input
+              id="aktaPendirianTanggal"
+              type="date"
+              {...register('aktaPendirianTanggal')}
               className={errors.aktaPendirianTanggal ? 'border-destructive' : ''}
             />
             {errors.aktaPendirianTanggal && <p className="text-sm text-destructive">{errors.aktaPendirianTanggal.message}</p>}
@@ -314,30 +313,30 @@ const NewApplicationForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <CardTitle className="text-md mb-2">2. Akta Perubahan Terakhir (Opsional)</CardTitle>
           <div>
             <Label htmlFor="aktaPerubahanNotaris">Nama Notaris</Label>
-            <Input 
-              id="aktaPerubahanNotaris" 
-              {...register('aktaPerubahanNotaris')} 
+            <Input
+              id="aktaPerubahanNotaris"
+              {...register('aktaPerubahanNotaris')}
               className={errors.aktaPerubahanNotaris ? 'border-destructive' : ''}
-              placeholder="Nama Notaris Akta Perubahan" 
+              placeholder="Nama Notaris Akta Perubahan"
             />
             {errors.aktaPerubahanNotaris && <p className="text-sm text-destructive">{errors.aktaPerubahanNotaris.message}</p>}
           </div>
           <div>
             <Label htmlFor="aktaPerubahanNomor">Nomor Akta</Label>
-            <Input 
-              id="aktaPerubahanNomor" 
-              {...register('aktaPerubahanNomor')} 
+            <Input
+              id="aktaPerubahanNomor"
+              {...register('aktaPerubahanNomor')}
               className={errors.aktaPerubahanNomor ? 'border-destructive' : ''}
-              placeholder="Nomor Akta Perubahan" 
+              placeholder="Nomor Akta Perubahan"
             />
             {errors.aktaPerubahanNomor && <p className="text-sm text-destructive">{errors.aktaPerubahanNomor.message}</p>}
           </div>
           <div>
             <Label htmlFor="aktaPerubahanTanggal">Tanggal Perubahan</Label>
-            <Input 
-              id="aktaPerubahanTanggal" 
-              type="date" 
-              {...register('aktaPerubahanTanggal')} 
+            <Input
+              id="aktaPerubahanTanggal"
+              type="date"
+              {...register('aktaPerubahanTanggal')}
               className={errors.aktaPerubahanTanggal ? 'border-destructive' : ''}
             />
             {errors.aktaPerubahanTanggal && <p className="text-sm text-destructive">{errors.aktaPerubahanTanggal.message}</p>}
@@ -349,11 +348,11 @@ const NewApplicationForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <CardTitle className="text-md mb-2">3. Pengesahan Akte Oleh Menteri Kehakiman RI (SK Kemenkumham) *</CardTitle>
           <div>
             <Label htmlFor="skKemenkumhamNomorTanggal">Nomor/Tanggal *</Label>
-            <Input 
-              id="skKemenkumhamNomorTanggal" 
-              {...register('skKemenkumhamNomorTanggal')} 
+            <Input
+              id="skKemenkumhamNomorTanggal"
+              {...register('skKemenkumhamNomorTanggal')}
               className={errors.skKemenkumhamNomorTanggal ? 'border-destructive' : ''}
-              placeholder="Contoh: AHU-0038954.AH.01.02.TAHUN 2023/10-07-2023" 
+              placeholder="Contoh: AHU-0038954.AH.01.02.TAHUN 2023/10-07-2023"
             />
             {errors.skKemenkumhamNomorTanggal && <p className="text-sm text-destructive">{errors.skKemenkumhamNomorTanggal.message}</p>}
           </div>
@@ -364,45 +363,57 @@ const NewApplicationForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           <CardTitle className="text-md mb-2">4. Tanggal NIB *</CardTitle>
           <div>
             <Label htmlFor="nibDate">Tanggal NIB *</Label>
-            <Input 
-              id="nibDate" 
-              type="date" 
-              {...register('nibDate')} 
+            <Input
+              id="nibDate"
+              type="date"
+              {...register('nibDate')}
               className={errors.nibDate ? 'border-destructive' : ''}
             />
             {errors.nibDate && <p className="text-sm text-destructive">{errors.nibDate.message}</p>}
           </div>
         </div>
-        
+
         {/* Input Kode Subbidang */}
         <div className="space-y-2 border-t pt-4">
-          <Label htmlFor="kodeSubbidang">Kode Subbidang *</Label>
-          <Input 
-            id="kodeSubbidang" 
-            {...register('kodeSubbidang')} 
-            className={errors.kodeSubbidang ? 'border-destructive' : ''}
-            placeholder="Contoh: AN 2.05.07.07" 
+          <Label htmlFor="subBidangCode">Kode Subbidang *</Label>
+          <Input
+            id="subBidangCode"
+            {...register('subBidangCode')}
+            className={errors.subBidangCode ? 'border-destructive' : ''}
+            placeholder="Contoh: AN 2.05.07.07"
           />
-          {errors.kodeSubbidang && <p className="text-sm text-destructive">{errors.kodeSubbidang.message}</p>}
+          {errors.subBidangCode && <p className="text-sm text-destructive">{errors.subBidangCode.message}</p>}
         </div>
 
-        {/* Input Bidang Usaha */}
+        {/* Input Klasifikasi Utama */}
         <div>
-          <Label htmlFor="businessField">Bidang Usaha *</Label> 
-          <Input 
-            id="businessField" 
-            {...register('businessField')} 
-            className={errors.businessField ? 'border-destructive' : ''}
-            placeholder="Contoh: jasa pemborongan telekomunikasi darat : kontrol & instrumen" 
+          <Label htmlFor="mainClassificationInput">Klasifikasi Utama *</Label>
+          <Input
+            id="mainClassificationInput"
+            {...register('mainClassificationInput')}
+            className={errors.mainClassificationInput ? 'border-destructive' : ''}
+            placeholder="Contoh: Konstruksi, Perdagangan, Jasa"
           />
-          {errors.businessField && <p className="text-sm text-destructive">{errors.businessField.message}</p>}
+          {errors.mainClassificationInput && <p className="text-sm text-destructive">{errors.mainClassificationInput.message}</p>}
+        </div>
+
+        {/* Input Nama Bidang Usaha */}
+        <div>
+          <Label htmlFor="bidangName">Nama Bidang Usaha *</Label>
+          <Input
+            id="bidangName"
+            {...register('bidangName')}
+            className={errors.bidangName ? 'border-destructive' : ''}
+            placeholder="Contoh: jasa pemborongan telekomunikasi darat : kontrol & instrumen"
+          />
+          {errors.bidangName && <p className="text-sm text-destructive">{errors.bidangName.message}</p>}
         </div>
 
         {/* Input SBU Application fields */}
         <div>
           <Label htmlFor="appType">Jenis Permohonan *</Label>
-          <Select 
-            value={applicationType} 
+          <Select
+            value={applicationType}
             onValueChange={(val: 'new' | 'renewal' | 'upgrade') => setValue('applicationType', val, { shouldValidate: true })}
           >
             <SelectTrigger className={errors.applicationType ? 'border-destructive' : ''}>
@@ -416,11 +427,11 @@ const NewApplicationForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </Select>
           {errors.applicationType && <p className="text-sm text-destructive">{errors.applicationType.message}</p>}
         </div>
-        
+
         <div>
           <Label htmlFor="qualification">Kualifikasi Perusahaan *</Label>
-          <Select 
-            value={companyQualification} 
+          <Select
+            value={watch('companyQualification')}
             onValueChange={(val: 'Kecil' | 'Menengah' | 'Besar') => setValue('companyQualification', val, { shouldValidate: true })}
           >
             <SelectTrigger className={errors.companyQualification ? 'border-destructive' : ''}>
@@ -438,11 +449,11 @@ const NewApplicationForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         {applicationType !== 'new' && (
           <div>
             <Label htmlFor="currentSbuNumber">Nomor SBU Saat Ini (Untuk Perpanjangan/Peningkatan)</Label>
-            <Input 
-              id="currentSbuNumber" 
-              {...register('currentSbuNumber')} 
+            <Input
+              id="currentSbuNumber"
+              {...register('currentSbuNumber')}
               className={errors.currentSbuNumber ? 'border-destructive' : ''}
-              placeholder="Masukkan nomor SBU Anda saat ini" 
+              placeholder="Masukkan nomor SBU Anda saat ini"
             />
             {errors.currentSbuNumber && <p className="text-sm text-destructive">{errors.currentSbuNumber.message}</p>}
           </div>
@@ -450,15 +461,15 @@ const NewApplicationForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
         <div>
           <Label htmlFor="notes">Catatan (Opsional)</Label>
-          <Textarea 
-            id="notes" 
-            {...register('notes')} 
+          <Textarea
+            id="notes"
+            {...register('notes')}
             className={errors.notes ? 'border-destructive' : ''}
-            placeholder="Tambahkan catatan jika ada" 
+            placeholder="Tambahkan catatan jika ada"
           />
           {errors.notes && <p className="text-sm text-destructive">{errors.notes.message}</p>}
         </div>
-        
+
         {/* File Neraca Tahun Terakhir - Tambah DocumentUploader */}
         <div className="space-y-2 border-t pt-4">
           <DocumentUploader
@@ -520,6 +531,7 @@ const Applications: React.FC = () => {
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showNewApplicationForm, setShowNewApplicationForm] = useState(false);
+  const [isSubmittingApplication, setIsSubmittingApplication] = useState(false); // New state for submit loading
 
   const navigate = useNavigate();
 
@@ -544,7 +556,7 @@ const Applications: React.FC = () => {
       } else {
         throw new Error(result.message || 'Gagal memuat data permohonan');
       }
-    } catch (error: any) { 
+    } catch (error: any) {
       toast({
         title: 'Gagal memuat data',
         description: error.message || 'Terjadi kesalahan saat memuat daftar permohonan',
@@ -554,6 +566,59 @@ const Applications: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Function to handle submitting a draft application
+  const handleSubmitApplication = async (applicationId: string) => {
+      setIsSubmittingApplication(true);
+      try {
+          const token = localStorage.getItem('token');
+          if (!token) {
+              throw new Error('Token autentikasi tidak ditemukan. Silakan login kembali.');
+          }
+
+          const csrfResponse = await fetch('/backend/api/auth/csrf-token.php');
+          const csrfData = await csrfResponse.json();
+          if (csrfData.status !== 'success' || !csrfData.data.csrf_token) {
+              throw new Error('Gagal mendapatkan token keamanan.');
+          }
+          const csrfToken = csrfData.data.csrf_token;
+
+          const response = await fetch('/backend/api/applications/submit.php', {
+              method: 'POST', // Ensure this matches your backend API
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`,
+                  'X-CSRF-Token': csrfToken,
+              },
+              body: JSON.stringify({ application_id: applicationId, csrf_token: csrfToken }),
+          });
+
+          const result = await response.json();
+
+          if (result.status === 'success') {
+              toast({
+                  title: 'Permohonan Berhasil Disubmit',
+                  description: result.message || 'Permohonan Anda sedang dalam proses review.',
+                  variant: 'default',
+              });
+              fetchApplications(); // Refresh the list to update status
+          } else {
+              toast({
+                  title: 'Gagal Submit Permohonan',
+                  description: result.message || 'Terjadi kesalahan saat menyubmit permohonan.',
+                  variant: 'destructive',
+              });
+          }
+      } catch (error: any) {
+          toast({
+              title: 'Error Jaringan',
+              description: error.message || 'Tidak dapat terhubung ke server untuk submit permohonan.',
+              variant: 'destructive',
+          });
+      } finally {
+          setIsSubmittingApplication(false);
+      }
   };
 
   const getStatusBadge = (status: string) => {
@@ -626,7 +691,7 @@ const Applications: React.FC = () => {
             Kelola permohonan Sertifikat Badan Usaha Anda
           </p>
         </div>
-        <Button 
+        <Button
           onClick={() => setShowNewApplicationForm(true)}
           className="w-full sm:w-auto"
         >
@@ -658,7 +723,7 @@ const Applications: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -672,7 +737,7 @@ const Applications: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -686,7 +751,7 @@ const Applications: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -737,19 +802,19 @@ const Applications: React.FC = () => {
                       {getStatusBadge(app.status)}
                     </div>
                   </CardHeader>
-                  
+
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 gap-3 text-sm">
                       <div>
                         <span className="font-medium">Klasifikasi:</span>
                         <div className="text-muted-foreground">{app.requested_classification}</div>
                       </div>
-                      
+
                       <div>
                         <span className="font-medium">Bidang Usaha:</span>
                         <div className="text-muted-foreground">{app.business_field}</div>
                       </div>
-                      
+
                       {/* Tampilkan Kode Subbidang dan Nama Bidang */}
                       {app.sub_bidang_code && (
                         <div>
@@ -759,16 +824,16 @@ const Applications: React.FC = () => {
                       )}
                       {app.bidang_name && (
                         <div>
-                          <span className="font-medium">Bidang:</span>
+                          <span className="font-medium">Nama Bidang:</span>
                           <div className="text-muted-foreground">{app.bidang_name}</div>
                         </div>
                       )}
-                      
+
                       <div className="flex justify-between">
                         <span className="font-medium">Kualifikasi:</span>
                         <Badge variant="outline">{app.company_qualification}</Badge>
                       </div>
-                      
+
                       <div className="flex justify-between">
                         <span className="font-medium">Dokumen:</span>
                         <span className="text-muted-foreground">{app.document_count} file</span>
@@ -794,16 +859,32 @@ const Applications: React.FC = () => {
                     )}
 
                     <div className="flex flex-col sm:flex-row gap-2 pt-2">
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <Eye className="w-4 h-4 mr-2" />
-                        Detail
-                      </Button>
-                      
+                      {/* Mengubah Button menjadi Link untuk Lihat Detail */}
+                      <Link to={`/applications/${app.id}`} className="flex-1">
+                          <Button variant="outline" size="sm" className="w-full">
+                              <Eye className="w-4 h-4 mr-2" />
+                              Detail
+                          </Button>
+                      </Link>
+
                       {app.status === 'completed' && (
-                        <Button variant="outline" size="sm" className="flex-1">
-                          <Download className="w-4 h-4 mr-2" />
-                          Unduh
-                        </Button>
+                          <Button variant="outline" size="sm" className="flex-1">
+                              <Download className="w-4 h-4 mr-2" />
+                              Unduh
+                          </Button>
+                      )}
+                      {/* Tombol Submit Permohonan (hanya jika status draft) */}
+                      {app.status === 'draft' && (
+                          <Button
+                              variant="default"
+                              size="sm"
+                              className="flex-1"
+                              onClick={() => handleSubmitApplication(app.id)}
+                              disabled={isSubmittingApplication} // Menonaktifkan tombol saat proses submit
+                          >
+                              <FileCheck className="w-4 h-4 mr-2" />
+                              {isSubmittingApplication ? 'Menyubmit...' : 'Submit Permohonan'}
+                          </Button>
                       )}
                     </div>
                   </CardContent>
