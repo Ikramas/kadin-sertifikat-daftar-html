@@ -44,13 +44,13 @@ class OTPManager {
             $mail->isSMTP();
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = 'kadin.indonesia.id@gmail.com'; // Ganti dengan email Anda
-            $mail->Password   = 'tekwpzbzsjpbqcuf';    // Ganti dengan app password Gmail Anda
+            $mail->Username   = 'saassasasasa@gmail.com    '; // Ganti dengan email Anda
+            $mail->Password   = '3232322323wedesdsdc';    // Ganti dengan app password Gmail Anda
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
             
             // Recipients
-            $mail->setFrom('kadin.indonesia.id@gmail.com', 'BSKI Portal');
+            $mail->setFrom('saassasasasa@gmail.com', 'BSKI Portal');
             $mail->addAddress($email, $userName);
             
             // Content
