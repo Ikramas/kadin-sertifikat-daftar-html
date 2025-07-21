@@ -1,0 +1,65 @@
+{
+  "common": {
+    "loading": "Memuat...",
+    "error": "Terjadi kesalahan",
+    "success": "Berhasil",
+    "cancel": "Batal",
+    "save": "Simpan",
+    "edit": "Ubah",
+    "delete": "Hapus",
+    "search": "Cari",
+    "filter": "Filter",
+    "export": "Ekspor",
+    "refresh": "Refresh",
+    "back": "Kembali",
+    "next": "Selanjutnya",
+    "previous": "Sebelumnya",
+    "submit": "Kirim",
+    "close": "Tutup"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "profile": "Profil",
+    "applications": "Permohonan",
+    "certificates": "Sertifikat",
+    "documents": "Dokumen",
+    "transactions": "Transaksi",
+    "guide": "Panduan",
+    "logout": "Keluar"
+  },
+  "auth": {
+    "login": "Masuk",
+    "register": "Daftar",
+    "email": "Email",
+    "password": "Kata Sandi",
+    "confirmPassword": "Konfirmasi Kata Sandi",
+    "forgotPassword": "Lupa Kata Sandi?",
+    "loginSuccess": "Berhasil masuk",
+    "registerSuccess": "Pendaftaran berhasil",
+    "invalidCredentials": "Email atau kata sandi salah",
+    "verifyOTP": "Verifikasi OTP",
+    "otpSent": "Kode OTP telah dikirim ke email Anda",
+    "resendOTP": "Kirim Ulang OTP"
+  },
+  "dashboard": {
+    "welcome": "Selamat datang",
+    "totalApplications": "Total Permohonan",
+    "activeCertificates": "Sertifikat Aktif",
+    "pendingReviews": "Menunggu Review",
+    "recentActivities": "Aktivitas Terbaru"
+  },
+  "forms": {
+    "required": "Field ini wajib diisi",
+    "emailInvalid": "Format email tidak valid",
+    "passwordTooShort": "Kata sandi minimal 8 karakter",
+    "passwordMismatch": "Kata sandi tidak cocok",
+    "phoneInvalid": "Format nomor telepon tidak valid"
+  },
+  "notifications": {
+    "newApplication": "Permohonan baru diterima",
+    "applicationApproved": "Permohonan Anda disetujui",
+    "applicationRejected": "Permohonan Anda ditolak",
+    "documentRequired": "Dokumen tambahan diperlukan",
+    "certificateExpiring": "Sertifikat akan segera berakhir"
+  }
+}
